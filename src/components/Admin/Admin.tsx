@@ -6,14 +6,15 @@ import Login from "../common/login/Login";
 import PageNotFound from "../common/PageNotFound/PageNotFound";
 
 export default function Admin() {
+  const adminLoginApi = "http://192.168.1.9:3000/admin/login";
   return (
     <>
-      <NavBar/>
+      <NavBar />
       <div className="container">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />
-          <Route path="login" element={<Login api='hero/admin/login'/>} />
+          <Route path="login" element={<Login api={adminLoginApi} />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
