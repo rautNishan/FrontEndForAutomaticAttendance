@@ -2,12 +2,12 @@
   font-family: sans-serif;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 400px;
-  margin: 90px auto;
+  height: 500px;
+  margin: 80px auto;
   background-color: #f4f4f4;
   padding: 10px;
   width: 500px;
+  border-radius: 90px;
 }
 
 .login {
@@ -15,6 +15,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 80px;
 }
 
 h1 {
@@ -32,6 +33,7 @@ h1 {
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
+  justify-content: center;
 }
 
 .field label {
@@ -53,10 +55,20 @@ button {
   cursor: pointer;
   margin-top: 10px;
   font-size: larger;
+  width: 70%;
+  align-self: center;
+  margin-top: 20px;
 }
 
 button:hover {
   background-color: #0056b3;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .field label {
@@ -71,10 +83,11 @@ button:hover {
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 100%;
+  align-items: center;
   font-size: 1em;
   color: #333;
   margin-bottom: 10px;
+  width: 70%;
 }
 
 .field input:focus {

@@ -1,5 +1,6 @@
 import "./Login.css";
-export default function Login() {
+export default function Login({ api }: { api: string }) {
+  console.log("This is API : ", api); 
   return (
     <>
       <div className="primary-container">
@@ -8,12 +9,7 @@ export default function Login() {
           <form className="form-container">
             <div className="field">
               <label htmlFor="email">Email</label>
-              <input
-                type="text"
-                id="email"
-                placeholder="Enter email"
-                required
-              />
+              <input type="text" id="username" placeholder="Enter email" />
             </div>
             <div className="field">
               <label htmlFor="password">Password</label>
@@ -21,7 +17,6 @@ export default function Login() {
                 type="password"
                 id="password"
                 placeholder="Enter password"
-                required
               />
             </div>
             <button type="submit">Login</button>
