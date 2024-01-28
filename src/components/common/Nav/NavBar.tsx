@@ -1,5 +1,5 @@
+import { useMatch, useResolvedPath } from "react-router-dom";
 import "./NavStyle.css";
-import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
 export default function NavBar({
   isLoggedIn,
@@ -10,11 +10,11 @@ export default function NavBar({
 }) {
   return (
     <div className="nav">
-      <Link to="" className="site-name">
+      <a href="home" className="site-name">
         Automation
-      </Link>
+      </a>
       <ul>
-        <CustomLink to="" name="Home" />
+        <CustomLink to="home" name="Home" />
         <CustomLink to="about" name="About" />
         <CustomLink to="login" name="Login" />
         {isLoggedIn && userRole === "admin" && (
@@ -33,13 +33,14 @@ type CustomLinkProps = {
 };
 
 function CustomLink({ to, name, ...props }: CustomLinkProps) {
+  console.log("This is to: ", to);
   const resolvePath = useResolvedPath(to);
   const isActive = useMatch({ path: resolvePath.pathname, end: true });
   return (
     <li className={isActive ? "active" : ""}>
-      <Link to={to} {...props}>
+      <a href={to} {...props}>
         {name}
-      </Link>
+      </a>
     </li>
   );
 }
