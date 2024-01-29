@@ -8,6 +8,8 @@ export default function NavBar({
   isLoggedIn: boolean;
   userRole: string;
 }) {
+  console.log("This is userRole NAV: ", userRole);
+  console.log("This is isLoggedIn NAV: ", isLoggedIn);
   return (
     <div className="nav">
       <a href="home" className="site-name">
@@ -16,9 +18,13 @@ export default function NavBar({
       <ul>
         <CustomLink to="home" name="Home" />
         <CustomLink to="about" name="About" />
-        <CustomLink to="login" name="Login" />
+
+        {!isLoggedIn && <CustomLink to="login" name="Login" />}
         {isLoggedIn && userRole === "admin" && (
           <CustomLink to="register-teacher" name="Register Teacher" />
+        )}
+        {isLoggedIn && userRole === "teacher" && (
+          <CustomLink to="register-teacher" name="Register Student" />
         )}
         {isLoggedIn && <CustomLink to="logout" name="Logout" />}
       </ul>

@@ -1,22 +1,16 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+// import { useNavigate } from "react-router-dom";
+
 import "./Login.css";
 
-export default function Login({ api }: { api: string }) {
+export default function Login({ api, role }: { api: string; role: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState(() =>
-    JSON.parse(localStorage.getItem("token") || "null")
-  );
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", JSON.stringify(token));
-    }
-  }, [token]);
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setEmailError("");
@@ -24,8 +18,10 @@ export default function Login({ api }: { api: string }) {
     setGeneralError("");
     try {
       const res = await axios.post(api, { email, password });
-      setToken(res.data);
-      window.location.reload()
+      localStorage.setItem("token", JSON.stringify(res.data));
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userRole", role);
+      window.location.href = "home";
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const errors = err.response?.data.message;
