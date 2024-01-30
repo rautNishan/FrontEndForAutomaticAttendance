@@ -3,18 +3,17 @@ import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
 import { AxiosError } from "axios";
 
-interface Teacher {
+interface Student {
   name: string;
 }
 
-export default function RegisterTeacher({ api }: { api: string }) {
-  const [teacherList, setTeacherList] = useState<Teacher[]>([]);
+export default function RegisterStudent({ api }: { api: string }) {
+  const [teacherList, setTeacherList] = useState<Student[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   console.log("teacherList", api);
   useEffect(() => {
-    const listAllTeacherApi = "/admin/get-all-teacher";
+    const listAllTeacherApi = "/admin/get-all-student";
     const token = localStorage.getItem("token");
-    console.log("This is token: ", token);
     const fetchTeachers = async () => {
       try {
         const response = await customAxios.get(listAllTeacherApi, {
@@ -22,14 +21,13 @@ export default function RegisterTeacher({ api }: { api: string }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("This is response", response.data.data);
-
-        setTeacherList(response.data.data);
+        console.log("This is response", response.data);
+        setTeacherList(response.data);
       } catch (error) {
-        setUserRole("");
-        setIsLoggedIn(false);
-        localStorage.removeItem("token");
-        if (error instanceof AxiosError && error.response) {
+        if (error instanceof AxiosError && error.response?.data.message=='jwt expired') {
+          setUserRole("");
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
           alert(error.response.data.message);
         }
       }

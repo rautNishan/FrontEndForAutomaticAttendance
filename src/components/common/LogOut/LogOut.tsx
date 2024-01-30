@@ -1,15 +1,21 @@
-import { useEffect } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../Auth/Auth";
 
-export default function LogOut({ onLogout }: { onLogout: () => void }) {
-  useEffect(() => {
+export default function LogOut() {
+  const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserRole("");
+
     localStorage.removeItem("token");
+    window.location.href = "login";
     // localStorage.removeItem("isLoggedIn");
     // localStorage.removeItem("userRole");
-    onLogout();
-  }, [onLogout]);
+    // onLogout();
+  };
   return (
     <>
-      <h1>LogOut Page</h1>
+      <button onClick={handleLogout}>Log Out</button>
     </>
   );
 }

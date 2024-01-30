@@ -1,3 +1,5 @@
-export default function Home() {
-  return <h1>This is Home Page</h1>;
+export default function Home({ user }: { user: string }) {
+  return <>
+  <h1>Hi {user} </h1>
+  </>;
 }

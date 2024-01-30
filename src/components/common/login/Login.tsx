@@ -1,11 +1,25 @@
-import axios from "axios";
 import { useState } from "react";
 
 // import { useNavigate } from "react-router-dom";
 
+import axios from "axios"; // This is the axios library
+import customAxios from "../../../apis/axios";
 import "./Login.css";
 
 export default function Login({ api, role }: { api: string; role: string }) {
+  console.log("THis is Api: ", api);
+  let redirectAfterLogin = "";
+  switch (role) {
+    case "admin":
+      redirectAfterLogin = "dash";
+      break;
+    case "teacher":
+      redirectAfterLogin = "profile";
+      break;
+    case "student":
+      redirectAfterLogin = "my-attendance";
+      break;
+  }
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -17,11 +31,11 @@ export default function Login({ api, role }: { api: string; role: string }) {
     setPasswordError("");
     setGeneralError("");
     try {
-      const res = await axios.post(api, { email, password });
-      localStorage.setItem("token", JSON.stringify(res.data));
+      const res = await customAxios.post(api, { email, password });
+      localStorage.setItem("token", res.data.data);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userRole", role);
-      window.location.href = "home";
+      window.location.href = redirectAfterLogin;
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const errors = err.response?.data.message;
