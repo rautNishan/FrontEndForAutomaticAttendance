@@ -90,7 +90,7 @@ export default function Login({ api, role }: { api: string; role: string }) {
                 required
               />
             </div>
-            <button type="submit">Login</button>
+            <button className="login_button" type="submit">Login</button>
           </form>
         </div>
       </div>

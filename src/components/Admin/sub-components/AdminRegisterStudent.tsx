@@ -3,12 +3,12 @@ import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
 import { AxiosError } from "axios";
 
-interface Student {
+interface IStudent {
   name: string;
 }
 
 export default function RegisterStudent({ api }: { api: string }) {
-  const [teacherList, setTeacherList] = useState<Student[]>([]);
+  const [teacherList, setTeacherList] = useState<IStudent[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   console.log("teacherList", api);
   useEffect(() => {
@@ -21,10 +21,13 @@ export default function RegisterStudent({ api }: { api: string }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("This is response", response.data);
-        setTeacherList(response.data);
+        console.log("This is response of Students", response.data.data);
+        setTeacherList(response.data.data);
       } catch (error) {
-        if (error instanceof AxiosError && error.response?.data.message=='jwt expired') {
+        if (
+          error instanceof AxiosError &&
+          error.response?.data.message == "jwt expired"
+        ) {
           setUserRole("");
           setIsLoggedIn(false);
           localStorage.removeItem("token");

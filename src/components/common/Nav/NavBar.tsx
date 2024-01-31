@@ -33,9 +33,12 @@ export default function NavBar({
         {/* {!isLoggedIn && <CustomLink to="about" name="About" />} */}
         {!isLoggedIn && <CustomLink to="login" name="Login" />}
         {isLoggedIn && userRole === "admin" && (
-          <CustomLink to="dash" name="Dash Board" />
+          <CustomLink to="dash" name="Dashboard" />
         )}
-         {isLoggedIn && userRole === "teacher" && (
+        {isLoggedIn && userRole === "admin" && (
+          <CustomLink to="faculty" name="Faculties" />
+        )}
+        {isLoggedIn && userRole === "teacher" && (
           <CustomLink to="profile" name="Profile" />
         )}
         {isLoggedIn && userRole === "admin" && (

@@ -9,6 +9,7 @@ import Login from "../common/login/Login";
 import AdminDashBoard from "./sub-components/AdminDashBoard";
 import RegisterTeacher from "./sub-components/AdminRegisterTeacher";
 import RegisterStudent from "./sub-components/AdminRegisterStudent";
+import Faculties from "./sub-components/AdminFaculties";
 
 export default function Admin() {
   const adminLoginApi = "/admin/login";
@@ -21,6 +22,7 @@ export default function Admin() {
           {!isLoggedIn ? (
             <Route path="/home" element={<Home user="Admin" />} />
           ) : null}
+          {isLoggedIn && <Route path="faculty" element={<Faculties />} />}
           {isLoggedIn && <Route path="dash" element={<AdminDashBoard />} />}
           {!isLoggedIn ? (
             <Route

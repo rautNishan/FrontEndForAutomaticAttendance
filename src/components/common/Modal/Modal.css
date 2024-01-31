@@ -1,0 +1,51 @@
+.modal-container{
+    font-family: sans-serif;
+}
+.modal{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    z-index: 1000;
+    text-align: center;
+    box-shadow: 9px -11px 15px 3px rgba(255, 255, 255, 0.3);
+
+  }
+.modal-button{
+    justify-content: center;
+}
+
+.modal-button button{
+    height: 2.5rem;
+    width: 5.5rem;
+    margin: 10px;
+    font-size: 13px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    color: whitesmoke;
+}
+button.save-button{
+    background-color: rgb(47 76 47)
+}
+button.cancel-button{
+    background-color: #160e0e;
+}
+.modal input{
+    padding: 8px 15px;
+    text-align: center;
+    margin: 10px;
+    border-bottom: 2px solid rgb(240, 240, 240);
+    color: black;
+}
+button.save-button:hover{
+    background-color: rgb(63 106 63);
+}
+button.cancel-button:hover{
+    background-color: rgb(81 20 20);
+}

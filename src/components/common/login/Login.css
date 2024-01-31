@@ -46,7 +46,20 @@ h1 {
   border: 1px solid #ccc;
 }
 
-button {
+/* button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: larger;
+  width: 70%;
+  align-self: center;
+  margin-top: 20px;
+} */
+.login_button{
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -59,8 +72,7 @@ button {
   align-self: center;
   margin-top: 20px;
 }
-
-button:hover {
+.login_button:hover {
   background-color: #0056b3;
 }
 
