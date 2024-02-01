@@ -29,6 +29,28 @@
   font-size: 16px;
 }
 
+.sub_header{
+  display: flex;
+  margin-left: 20px;
+  justify-content: space-around;
+  align-items: center;
+  width: 40%;
+}
+.filter-by{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-weight: bold;
+}
+
+.filter-by select{
+  border: 2px solid black;
+  display: flex;
+  height: 2.5rem;
+  margin-left: 20px;
+  font-weight: bold;
+}
+
 input {
   padding: 10px 15px;
   border-radius: 5px;
@@ -153,6 +175,7 @@ span {
 .add-icon {
   margin-right: 10px;
 }
+
 .modal-backdrop {
   position: fixed;
   top: 0;

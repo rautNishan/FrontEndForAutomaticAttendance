@@ -1,0 +1,44 @@
+.teacher-modal-container {
+  font-family: sans-serif;
+}
+
+.teacher-register-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 500px;
+  z-index: 1000;
+  height: 600px;
+  text-align: center;
+  box-shadow: 9px -11px 15px 3px rgba(255, 255, 255, 0.3);
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+.form-field input{
+    padding: 8px 15px;
+    text-align: center;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 7px;
+}
+.form-field label {
+  padding: 10px 20px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-field select{
+    padding: 8px 15px;
+    text-align: center;
+    margin: 10px;
+    color: black;
+    border: 2px solid black;
+    border-radius: 7px;
+
+}

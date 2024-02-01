@@ -10,7 +10,14 @@ import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
 import Modal from "../../common/Modal/Modal";
 import "./css/Faculty.css";
+import ConfirmModal from "../../common/Modal/ConfirmModel";
 interface IFaculty {
+  _id: string;
+  name: string;
+  teacherCounts: number;
+  studentCounts: number;
+}
+interface IFacultyEdit {
   _id: string;
   name: string;
 }
@@ -20,12 +27,46 @@ export default function Faculties() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [facultyList, setFacultyList] = useState<IFaculty[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFaculty, setSelectedFaculty] = useState<IFaculty | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
+  const [selectedFaculty, setSelectedFaculty] = useState<IFacultyEdit | null>(
+    null
+  );
   const [successMessage, setSuccessMessage] = useState(null || "");
-  const handleEdit = (faculty: IFaculty) => {
+
+  const handleEdit = (faculty: IFacultyEdit) => {
     setSelectedFaculty(faculty);
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDelete = async (faculty: IFacultyEdit) => {
+    setSelectedFaculty(faculty);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteFaculty = async () => {
+    const id = selectedFaculty?._id;
+    try {
+      const response = await customAxios.delete(`/admin/delete-faculty/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log("This is Response: ", response.data);
+      setIsDeleteModalOpen(false);
+      window.location.href = "faculty";
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.data.message == "JWT EXPIRED") {
+          setUserRole("");
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+        }
+        const responseToBeSent = error.response?.data.message;
+        setErrorMessage(responseToBeSent);
+        setIsDeleteModalOpen(false);
+      }
+    }
   };
   const handleSave = async (updatedName: string) => {
     const dataToBeSent = updatedName.toUpperCase();
@@ -45,7 +86,7 @@ export default function Faculties() {
       );
       console.log("This is Response: ", response.data);
       setSuccessMessage("Faculty Updated Successfully");
-      setIsModalOpen(false);
+      setIsEditModalOpen(false);
       setTimeout(() => {
         window.location.href = "faculty";
       }, 1200);
@@ -58,7 +99,7 @@ export default function Faculties() {
         }
         const responseToBeSent = error.response?.data.message;
         setErrorMessage(responseToBeSent);
-        setIsModalOpen(false);
+        setIsEditModalOpen(false);
       }
     }
   };
@@ -177,8 +218,14 @@ export default function Faculties() {
                     <td>
                       <strong>{faculty.name}</strong>
                     </td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td>
+                      {" "}
+                      <strong>{faculty.teacherCounts}</strong>
+                    </td>
+                    <td>
+                      {" "}
+                      <strong>{faculty.studentCounts}</strong>
+                    </td>
                     {/* <td>{faculty.teacherCount}</td> 
                   <td>{faculty.studentCount}</td>  */}
                     <td>
@@ -191,7 +238,13 @@ export default function Faculties() {
                       >
                         <FontAwesomeIcon className="icon" icon={faEdit} />
                       </button>
-                      <button title="Delete Faculty" className="delete_button">
+                      <button
+                        title="Delete Faculty"
+                        className="delete_button"
+                        onClick={() =>
+                          handleDelete({ name: faculty.name, _id: faculty._id })
+                        }
+                      >
                         <FontAwesomeIcon className="icon" icon={faTrashAlt} />
                       </button>
                     </td>
@@ -202,12 +255,20 @@ export default function Faculties() {
           </div>
         </div>
       </div>
-      {isModalOpen && <div className="modal-backdrop" />}
-      {isModalOpen && selectedFaculty && (
+      {isEditModalOpen && <div className="modal-backdrop" />}
+      {isEditModalOpen && selectedFaculty && (
         <Modal
           faculty={selectedFaculty}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => setIsEditModalOpen(false)}
           onSave={handleSave}
+        />
+      )}
+      {isDeleteModel && <div className="modal-backdrop" />}
+      {isDeleteModel && selectedFaculty && (
+        <ConfirmModal
+          data={selectedFaculty}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onSave={handleDeleteFaculty}
         />
       )}
     </>
