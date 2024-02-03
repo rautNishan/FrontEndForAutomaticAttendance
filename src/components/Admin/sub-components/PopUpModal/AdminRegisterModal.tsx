@@ -6,6 +6,7 @@ interface ModalProps {
   isUpdate?: boolean;
   initialData?: {
     name: string;
+    college_id?: string;
     faculty: string;
     email: string;
     password: string;
@@ -13,6 +14,7 @@ interface ModalProps {
   onSave: (data: {
     _id?: string;
     name: string;
+    college_id: string;
     faculty: string;
     email: string;
     password: string;
@@ -28,12 +30,13 @@ export default function TeacherDataModal({
   const [name, setName] = useState(initialData?.name || "");
   const [faculty, setFaculty] = useState(initialData?.faculty || "Computing");
   const [email, setEmail] = useState(initialData?.email || "");
+  const [college_id, setCollegeId] = useState(initialData?.college_id || "");
   const [password, setPassword] = useState(initialData?.password || "");
   const isAnyFieldEmpty =
     !isUpdate && (!name || !faculty || !email || !password);
 
   const handleSave = () => {
-    onSave({ name, faculty, email, password });
+    onSave({ name, faculty, email, college_id, password });
   };
 
   return (
@@ -46,6 +49,14 @@ export default function TeacherDataModal({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="form-field">
+          <label>College Id</label>
+          <input
+            type="college_id"
+            value={college_id}
+            onChange={(e) => setCollegeId(e.target.value)}
           />
         </div>
         <div className="form-field">

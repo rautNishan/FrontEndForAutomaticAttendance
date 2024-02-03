@@ -1,19 +1,20 @@
+import {
+  faEdit,
+  faTrashAlt,
+  faCirclePlus,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios, { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
-import axios, { AxiosError } from "axios";
-import {
-  faCirclePlus,
-  faEdit,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
-import "./css/Faculty.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import TeacherDataModal from "./PopUpModal/AdminRegisterModal";
 import ConfirmModal from "../../common/Modal/ConfirmModel";
+import TeacherDataModal from "./PopUpModal/AdminRegisterModal";
+import "./css/Faculty.css";
 interface ITeacher {
   _id?: string;
   name: string;
+  college_id: string;
   faculty: string;
   email: string;
   password: string;
@@ -24,11 +25,13 @@ interface ITeacher {
 // }
 interface ITeacherRegisterData {
   name: string;
+  college_id: string;
   faculty: string;
   email: string;
   password: string;
 }
 export default function RegisterTeacher({ api }: { api: string }) {
+  console.log("This is API: ", api);
   const token = localStorage.getItem("token");
   const [teacherList, setTeacherList] = useState<ITeacher[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<ITeacher | null>(null);
@@ -36,16 +39,30 @@ export default function RegisterTeacher({ api }: { api: string }) {
   const [successMessage, setSuccessMessage] = useState(null || "");
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
+  const [searchValues, setSearchValues] = useState(null || "");
 
   const [isTeacherModelComponentOpen, setIsTeacherModelComponentOpen] =
     useState(false);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("" || null);
 
-  console.log(api);
+  // const searchTeacher = useCallback(async () => {
+  //   console.log("Add Teacher Called");
+  //   const response = await customAxios.get(
+  //     `admin/get-all-teacher?search_key=${searchValues}`,
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     }
+  //   );
+  //   const responseData = response.data.data;
+  //   setTeacherList(responseData);
+  // }, [searchValues, token]);
 
   useEffect(() => {
     const listAllTeacherApi = "/admin/get-all-teacher";
     const token = localStorage.getItem("token");
+
     console.log("This is token: ", token);
     const fetchTeachers = async () => {
       try {
@@ -66,22 +83,30 @@ export default function RegisterTeacher({ api }: { api: string }) {
         }
       }
     };
-
     fetchTeachers();
-  }, [setUserRole, setIsLoggedIn]);
+    // if (searchValues != "" || searchValues != null) {
+    //   searchTeacher();
+    // }
+    const searchTeacher = async () => {
+      const response = await customAxios.get(
+        `admin/get-all-teacher?search_key=${searchValues}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const responseData = response.data.data;
+      setTeacherList(responseData);
+    };
+    searchTeacher();
+  }, [setUserRole, setIsLoggedIn, searchValues]);
 
   //Closing Model
   const closeModel = () => {
     setSelectedTeacher(null);
     setIsTeacherModelComponentOpen(false);
     setIsDeleteModalOpen(false);
-  };
-
-  //Add Teacher
-  const addTeacher = () => {
-    console.log("Add Teacher Called");
-    setIsUpdate(false);
-    setIsTeacherModelComponentOpen(true);
   };
 
   //Handel Register
@@ -186,6 +211,12 @@ export default function RegisterTeacher({ api }: { api: string }) {
     }
   };
 
+  //Add Teacher
+  const addTeacher = () => {
+    console.log("Add Teacher Called");
+    setIsUpdate(false);
+    setIsTeacherModelComponentOpen(true);
+  };
   //Return
   return (
     <>
@@ -221,15 +252,6 @@ export default function RegisterTeacher({ api }: { api: string }) {
           <div className="table_header">
             <p className="title">Register Teacher</p>
             <div className="sub_header">
-              {/* <p>Filter By</p> */}
-              <div className="filter-by">
-                <p>Filter By</p>
-                <select>
-                  <option value="All">All</option>
-                  <option value="Computing">Computing</option>
-                  <option value="Networking">Networking</option>
-                </select>
-              </div>
               <button
                 title="Register Teacher"
                 className="add_new"
@@ -238,6 +260,12 @@ export default function RegisterTeacher({ api }: { api: string }) {
                 <FontAwesomeIcon className="add-icon" icon={faCirclePlus} />
                 Register Teacher
               </button>
+              <input
+                placeholder="Search Teacher"
+                value={searchValues}
+                onChange={(e) => setSearchValues(e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className="table_body">
@@ -247,6 +275,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
                   <th>Teacher Name</th>
                   <th>Faculty</th>
                   <th>Email</th>
+                  <th>College Id</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -264,6 +293,9 @@ export default function RegisterTeacher({ api }: { api: string }) {
                     <td>
                       <strong>{teacher.email}</strong>
                     </td>
+                    <td>
+                      <strong>{teacher.college_id}</strong>
+                    </td>
                     {/* <td>{faculty.teacherCount}</td> 
                   <td>{faculty.studentCount}</td>  */}
                     <td>
@@ -274,6 +306,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
                           handleEdit({
                             _id: teacher._id,
                             name: teacher.name,
+                            college_id: teacher.college_id,
                             faculty: teacher.faculty,
                             email: teacher.email,
                             password: "",
@@ -288,6 +321,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
                         onClick={() =>
                           handleDelete({
                             name: teacher.name,
+                            college_id: teacher.college_id,
                             _id: teacher._id,
                             faculty: teacher.faculty,
                             email: teacher.email,

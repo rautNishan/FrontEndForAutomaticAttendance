@@ -14,7 +14,12 @@ body {
   align-items: center;
   padding: 0 20px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+
 }
+/* .customNavBar {
+  border: 2px solid rgb(206, 28, 28);
+  overflow: hidden;
+} */
 ul {
   display: flex;
 }
@@ -35,7 +40,7 @@ ul li {
   font-family: sans-serif;
   font-size: 20px;
   letter-spacing: 1px;
-  color: white;
+  color: gray;
   display: inline-block;
   transition: color 0.3s ease;
   padding: 15px 10px;
@@ -55,14 +60,15 @@ ul li {
 
 .nav a:hover {
   transform: scale(1.2);
+  color: #ffffff;
+  text-decoration: none;
 }
 
-.site-name:hover {
-  transform: scale(1);
+.nav a .site-name:hover {
   border-bottom: 3px solid rgb(245, 238, 238);
 }
 
 .nav li.active a {
   background: transparent;
-  color: #a9a9a9;
+  color: #ffffff;
 }

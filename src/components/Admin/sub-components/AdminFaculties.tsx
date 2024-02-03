@@ -1,16 +1,11 @@
-import {
-  faCirclePlus,
-  faEdit,
-  faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCirclePlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios, { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
-import Modal from "../../common/Modal/Modal";
-import "./css/Faculty.css";
 import ConfirmModal from "../../common/Modal/ConfirmModel";
+import "./css/Faculty.css";
 interface IFaculty {
   _id: string;
   name: string;
@@ -27,17 +22,17 @@ export default function Faculties() {
   const [errorMessage, setErrorMessage] = useState(null);
   const [facultyList, setFacultyList] = useState<IFaculty[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState<IFacultyEdit | null>(
     null
   );
-  const [successMessage, setSuccessMessage] = useState(null || "");
+  // const [successMessage, setSuccessMessage] = useState(null || "");
 
-  const handleEdit = (faculty: IFacultyEdit) => {
-    setSelectedFaculty(faculty);
-    setIsEditModalOpen(true);
-  };
+  // const handleEdit = (faculty: IFacultyEdit) => {
+  //   setSelectedFaculty(faculty);
+  //   setIsEditModalOpen(true);
+  // };
 
   const handleDelete = async (faculty: IFacultyEdit) => {
     setSelectedFaculty(faculty);
@@ -68,46 +63,47 @@ export default function Faculties() {
       }
     }
   };
-  const handleSave = async (updatedName: string) => {
-    const dataToBeSent = updatedName.toUpperCase();
-    const id = selectedFaculty?._id;
-    try {
-      const response = await customAxios.patch(
-        "/admin/edit-faculty",
-        {
-          id: id,
-          name: dataToBeSent,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log("This is Response: ", response.data);
-      setSuccessMessage("Faculty Updated Successfully");
-      setIsEditModalOpen(false);
-      setTimeout(() => {
-        window.location.href = "faculty";
-      }, 1200);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.data.message == "JWT EXPIRED") {
-          setUserRole("");
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-        }
-        const responseToBeSent = error.response?.data.message;
-        setErrorMessage(responseToBeSent);
-        setIsEditModalOpen(false);
-      }
-    }
-  };
+  // const handleSave = async (updatedName: string) => {
+  //   const dataToBeSent = updatedName.toUpperCase();
+  //   const id = selectedFaculty?._id;
+  //   try {
+  //     const response = await customAxios.patch(
+  //       "/admin/edit-faculty",
+  //       {
+  //         id: id,
+  //         name: dataToBeSent,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("This is Response: ", response.data);
+  //     setSuccessMessage("Faculty Updated Successfully");
+  //     setIsEditModalOpen(false);
+  //     setTimeout(() => {
+  //       window.location.href = "faculty";
+  //     }, 1200);
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.response?.data.message == "JWT EXPIRED") {
+  //         setUserRole("");
+  //         setIsLoggedIn(false);
+  //         localStorage.removeItem("token");
+  //       }
+  //       const responseToBeSent = error.response?.data.message;
+  //       setErrorMessage(responseToBeSent);
+  //       setIsEditModalOpen(false);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("this is token: ", token);
         const response = await customAxios.get(getAllFacultiesApi, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -172,15 +168,6 @@ export default function Faculties() {
             </button>
           </div>
         )}
-
-        {successMessage && (
-          <div className="success_container">
-            <div className="success_message">
-              {/* <p>{errorMessage}</p> */}
-              <strong>{successMessage}</strong>
-            </div>
-          </div>
-        )}
         <div className="table">
           <div className="table_header">
             <p className="title">Faculty List</p>
@@ -229,7 +216,7 @@ export default function Faculties() {
                     {/* <td>{faculty.teacherCount}</td> 
                   <td>{faculty.studentCount}</td>  */}
                     <td>
-                      <button
+                      {/* <button
                         className="edit_button"
                         title="Edit Faculty"
                         onClick={() =>
@@ -237,7 +224,7 @@ export default function Faculties() {
                         }
                       >
                         <FontAwesomeIcon className="icon" icon={faEdit} />
-                      </button>
+                      </button> */}
                       <button
                         title="Delete Faculty"
                         className="delete_button"
@@ -255,14 +242,14 @@ export default function Faculties() {
           </div>
         </div>
       </div>
-      {isEditModalOpen && <div className="modal-backdrop" />}
+      {/* {isEditModalOpen && <div className="modal-backdrop" />}
       {isEditModalOpen && selectedFaculty && (
         <Modal
           faculty={selectedFaculty}
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSave}
         />
-      )}
+      )} */}
       {isDeleteModel && <div className="modal-backdrop" />}
       {isDeleteModel && selectedFaculty && (
         <ConfirmModal

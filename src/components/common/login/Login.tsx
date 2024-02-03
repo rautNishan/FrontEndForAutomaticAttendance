@@ -32,6 +32,8 @@ export default function Login({ api, role }: { api: string; role: string }) {
     setGeneralError("");
     try {
       const res = await customAxios.post(api, { email, password });
+      console.log("This is Response: ", res.data.data);
+
       localStorage.setItem("token", res.data.data);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userRole", role);
@@ -90,7 +92,9 @@ export default function Login({ api, role }: { api: string; role: string }) {
                 required
               />
             </div>
-            <button className="login_button" type="submit">Login</button>
+            <button className="login_button" type="submit">
+              Login
+            </button>
           </form>
         </div>
       </div>

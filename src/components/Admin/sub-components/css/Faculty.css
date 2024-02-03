@@ -22,34 +22,28 @@
   padding: 15px 20px;
   outline: none;
   border: none;
-  background-color: rgb(64 115 3);
+  background-color: rgb(66 157 223);
   color: white;
   border-radius: 6px;
   font-weight: bold;
   font-size: 16px;
 }
 
-.sub_header{
+.sub_header {
   display: flex;
   margin-left: 20px;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  width: 40%;
-}
-.filter-by{
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  font-weight: bold;
+  width: 80%;
 }
 
-.filter-by select{
+/* .filter-by select {
   border: 2px solid black;
   display: flex;
   height: 2.5rem;
   margin-left: 20px;
   font-weight: bold;
-}
+} */
 
 input {
   padding: 10px 15px;

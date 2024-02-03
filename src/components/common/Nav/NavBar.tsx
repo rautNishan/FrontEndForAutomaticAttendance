@@ -26,7 +26,7 @@ export default function NavBar({
   return (
     <div className="nav">
       <a href={rootNav} className="site-name">
-        Automation
+        AUTOMATION
       </a>
       <ul>
         {!isLoggedIn && <CustomLink to="home" name="Home" />}
