@@ -40,8 +40,8 @@ export default function TeacherDataModal({
   };
 
   return (
-    <div className="teacher-modal-container">
-      <div className="teacher-register-modal">
+    <div className="popup-modal-container">
+      <div className="popup-register-modal">
         <h2>{isUpdate ? "Update Teacher" : "Register Teacher"}</h2>
         <div className="form-field">
           <label>Name</label>

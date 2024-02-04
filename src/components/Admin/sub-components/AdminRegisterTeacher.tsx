@@ -1,7 +1,7 @@
 import {
+  faCirclePlus,
   faEdit,
   faTrashAlt,
-  faCirclePlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios, { AxiosError } from "axios";
@@ -9,7 +9,7 @@ import { useContext, useEffect, useState } from "react";
 import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
 import ConfirmModal from "../../common/Modal/ConfirmModel";
-import TeacherDataModal from "./PopUpModal/AdminRegisterModal";
+import TeacherDataModal from "./PopUpModal/AdminTeacherRegisterModal";
 import "./css/Faculty.css";
 interface ITeacher {
   _id?: string;
@@ -40,30 +40,18 @@ export default function RegisterTeacher({ api }: { api: string }) {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
   const [searchValues, setSearchValues] = useState(null || "");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTeachers, setTotalTeachers] = useState(0);
+  const teachersPerPage = 5;
 
   const [isTeacherModelComponentOpen, setIsTeacherModelComponentOpen] =
     useState(false);
   const [errorMessage, setErrorMessage] = useState("" || null);
 
-  // const searchTeacher = useCallback(async () => {
-  //   console.log("Add Teacher Called");
-  //   const response = await customAxios.get(
-  //     `admin/get-all-teacher?search_key=${searchValues}`,
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     }
-  //   );
-  //   const responseData = response.data.data;
-  //   setTeacherList(responseData);
-  // }, [searchValues, token]);
-
   useEffect(() => {
-    const listAllTeacherApi = "/admin/get-all-teacher";
+    const listAllTeacherApi = `/admin/get-all-teacher?page=${currentPage}`;
     const token = localStorage.getItem("token");
-
-    console.log("This is token: ", token);
+    console.log("This is List All Teacher Api: ", listAllTeacherApi);
     const fetchTeachers = async () => {
       try {
         const response = await customAxios.get(listAllTeacherApi, {
@@ -71,9 +59,10 @@ export default function RegisterTeacher({ api }: { api: string }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("This is response", response.data.data);
-
-        setTeacherList(response.data.data);
+        console.log(response.data.data.totalCount);
+        setTotalTeachers(response.data.data.totalCount);
+        console.log("This is Response: ", response.data.data.teachers);
+        setTeacherList(response.data.data.teachers);
       } catch (error) {
         setUserRole("");
         setIsLoggedIn(false);
@@ -84,9 +73,12 @@ export default function RegisterTeacher({ api }: { api: string }) {
       }
     };
     fetchTeachers();
-    // if (searchValues != "" || searchValues != null) {
-    //   searchTeacher();
-    // }
+    console.log("This is TEacherList Page: ", teacherList);
+  }, [setUserRole, setIsLoggedIn, currentPage, setTotalTeachers]);
+
+  // Search teachers when searchValues changes
+  useEffect(() => {
+    const token = localStorage.getItem("token");
     const searchTeacher = async () => {
       const response = await customAxios.get(
         `admin/get-all-teacher?search_key=${searchValues}`,
@@ -96,12 +88,15 @@ export default function RegisterTeacher({ api }: { api: string }) {
           },
         }
       );
-      const responseData = response.data.data;
+      const responseData = response.data.data.teachers;
+      console.log("This is Search");
+
       setTeacherList(responseData);
     };
-    searchTeacher();
-  }, [setUserRole, setIsLoggedIn, searchValues]);
-
+    if (searchValues != "" || searchValues != null) {
+      searchTeacher();
+    }
+  }, [searchValues]);
   //Closing Model
   const closeModel = () => {
     setSelectedTeacher(null);
@@ -250,7 +245,9 @@ export default function RegisterTeacher({ api }: { api: string }) {
         )}
         <div className="table">
           <div className="table_header">
-            <p className="title">Register Teacher</p>
+          <p>
+            <strong>Total Teachers:  {totalTeachers}</strong>
+          </p>
             <div className="sub_header">
               <button
                 title="Register Teacher"
@@ -339,6 +336,42 @@ export default function RegisterTeacher({ api }: { api: string }) {
           </div>
         </div>
       </div>
+      {totalTeachers > teachersPerPage && (
+        <div className="pagination">
+          <ul className="pagination-ul">
+            <li className="page-item">
+              <button
+                className={`page-link ${currentPage === 1 ? "disabled" : ""}`}
+                onClick={() =>
+                  currentPage > 1 && setCurrentPage(currentPage - 1)
+                }
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+            </li>
+            <li className="page-item">
+              <button
+                className={`page-link ${
+                  currentPage === Math.ceil(totalTeachers / teachersPerPage)
+                    ? "disabled"
+                    : ""
+                }`}
+                onClick={() =>
+                  currentPage < Math.ceil(totalTeachers / teachersPerPage) &&
+                  setCurrentPage(currentPage + 1)
+                }
+                disabled={
+                  currentPage === Math.ceil(totalTeachers / teachersPerPage)
+                }
+              >
+                Next
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
+
       {isTeacherModelComponentOpen && <div className="modal-backdrop" />}
       {isTeacherModelComponentOpen && (
         <TeacherDataModal

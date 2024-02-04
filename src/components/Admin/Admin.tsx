@@ -10,13 +10,16 @@ import AdminDashBoard from "./sub-components/AdminDashBoard";
 import RegisterTeacher from "./sub-components/AdminRegisterTeacher";
 import RegisterStudent from "./sub-components/AdminRegisterStudent";
 import Faculties from "./sub-components/AdminFaculties";
-
+import './Admin.css';
 export default function Admin() {
   const adminLoginApi = "/admin/login";
   const { isLoggedIn, userRole } = useContext(AuthContext);
   return (
     <>
-      <NavBar isLoggedIn={isLoggedIn} userRole={userRole} />
+    <header>
+    <NavBar isLoggedIn={isLoggedIn} userRole={userRole} />
+    </header>
+ 
         <div className="container">
           <Routes>
             {!isLoggedIn ? (
@@ -50,3 +53,5 @@ export default function Admin() {
     </>
   );
 }
+
+
