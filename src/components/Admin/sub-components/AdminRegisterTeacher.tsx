@@ -73,7 +73,6 @@ export default function RegisterTeacher({ api }: { api: string }) {
       }
     };
     fetchTeachers();
-    console.log("This is TEacherList Page: ", teacherList);
   }, [setUserRole, setIsLoggedIn, currentPage, setTotalTeachers]);
 
   // Search teachers when searchValues changes
@@ -238,16 +237,15 @@ export default function RegisterTeacher({ api }: { api: string }) {
         {successMessage && (
           <div className="success_container">
             <div className="success_message">
-              {/* <p>{errorMessage}</p> */}
               <strong>{successMessage}</strong>
             </div>
           </div>
         )}
         <div className="table">
           <div className="table_header">
-          <p>
-            <strong>Total Teachers:  {totalTeachers}</strong>
-          </p>
+            <p>
+              <strong>Total Teachers: {totalTeachers}</strong>
+            </p>
             <div className="sub_header">
               <button
                 title="Register Teacher"

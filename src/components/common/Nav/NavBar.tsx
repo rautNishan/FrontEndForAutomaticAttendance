@@ -38,6 +38,9 @@ export default function NavBar({
         {isLoggedIn && userRole === "admin" && (
           <CustomLink to="faculty" name="Faculties" />
         )}
+        {isLoggedIn && userRole === "admin" && (
+          <CustomLink to="section" name="Sections" />
+        )}
         {isLoggedIn && userRole === "teacher" && (
           <CustomLink to="profile" name="Profile" />
         )}

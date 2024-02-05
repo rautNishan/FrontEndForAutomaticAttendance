@@ -24,6 +24,8 @@ export default function Faculties() {
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   // const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
+
+
   const [selectedFaculty, setSelectedFaculty] = useState<IFacultyEdit | null>(
     null
   );
@@ -63,44 +65,9 @@ export default function Faculties() {
       }
     }
   };
-  // const handleSave = async (updatedName: string) => {
-  //   const dataToBeSent = updatedName.toUpperCase();
-  //   const id = selectedFaculty?._id;
-  //   try {
-  //     const response = await customAxios.patch(
-  //       "/admin/edit-faculty",
-  //       {
-  //         id: id,
-  //         name: dataToBeSent,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-  //     console.log("This is Response: ", response.data);
-  //     setSuccessMessage("Faculty Updated Successfully");
-  //     setIsEditModalOpen(false);
-  //     setTimeout(() => {
-  //       window.location.href = "faculty";
-  //     }, 1200);
-  //   } catch (error) {
-  //     if (axios.isAxiosError(error)) {
-  //       if (error.response?.data.message == "JWT EXPIRED") {
-  //         setUserRole("");
-  //         setIsLoggedIn(false);
-  //         localStorage.removeItem("token");
-  //       }
-  //       const responseToBeSent = error.response?.data.message;
-  //       setErrorMessage(responseToBeSent);
-  //       setIsEditModalOpen(false);
-  //     }
-  //   }
-  // };
 
   useEffect(() => {
-    const fetchTeachers = async () => {
+    const fetchFaculties = async () => {
       try {
         const token = localStorage.getItem("token");
         console.log("this is token: ", token);
@@ -123,7 +90,7 @@ export default function Faculties() {
       }
     };
 
-    fetchTeachers();
+    fetchFaculties();
   }, [setUserRole, setIsLoggedIn]);
 
   async function addFaculty() {
@@ -216,15 +183,6 @@ export default function Faculties() {
                     {/* <td>{faculty.teacherCount}</td> 
                   <td>{faculty.studentCount}</td>  */}
                     <td>
-                      {/* <button
-                        className="edit_button"
-                        title="Edit Faculty"
-                        onClick={() =>
-                          handleEdit({ name: faculty.name, _id: faculty._id })
-                        }
-                      >
-                        <FontAwesomeIcon className="icon" icon={faEdit} />
-                      </button> */}
                       <button
                         title="Delete Faculty"
                         className="delete_button"
@@ -242,14 +200,7 @@ export default function Faculties() {
           </div>
         </div>
       </div>
-      {/* {isEditModalOpen && <div className="modal-backdrop" />}
-      {isEditModalOpen && selectedFaculty && (
-        <Modal
-          faculty={selectedFaculty}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={handleSave}
-        />
-      )} */}
+
       {isDeleteModel && <div className="modal-backdrop" />}
       {isDeleteModel && selectedFaculty && (
         <ConfirmModal

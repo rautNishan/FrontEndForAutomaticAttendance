@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./ModalCssForAdmin/RegisterTeacherModal.css";
+import "./ModalCssForAdmin/RegisterModal.css";
 
 interface ModalProps {
   onClose: () => void;
@@ -28,7 +28,7 @@ export default function StudentDataModal({
   initialData,
 }: ModalProps) {
   const [name, setName] = useState(initialData?.name || "");
-  const [faculty, setFaculty] = useState(initialData?.faculty || "Computing");
+  const [faculty, setFaculty] = useState("Computing");
   const [email, setEmail] = useState(initialData?.email || "");
   const [college_id, setCollegeId] = useState(initialData?.college_id || "");
   const [password, setPassword] = useState(initialData?.password || "");
@@ -42,7 +42,7 @@ export default function StudentDataModal({
   return (
     <div className="popup-modal-container">
       <div className="popup-register-modal">
-        <h2>{isUpdate ? "Update Teacher" : "Register Teacher"}</h2>
+        <h2>{isUpdate ? "Update Student" : "Register Student"}</h2>
         <div className="form-field">
           <label>Name</label>
           <input
@@ -51,29 +51,36 @@ export default function StudentDataModal({
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div className="form-field">
-          <label>College Id</label>
-          <input
-            type="college_id"
-            value={college_id}
-            onChange={(e) => setCollegeId(e.target.value)}
-          />
-        </div>
+        {!isUpdate && (
+          <div className="form-field">
+            <label>College Id</label>
+            <input
+              type="college_id"
+              value={college_id}
+              onChange={(e) => setCollegeId(e.target.value)}
+            />
+          </div>
+        )}
         <div className="form-field">
           <label>Faculty</label>
-          <select value={faculty} onChange={(e) => setFaculty(e.target.value)}>
+          <select
+            value={faculty}
+            onChange={(e) => setFaculty(e.target.value.trim())}
+          >
             <option value="Computing">Computing</option>
             <option value="Networking">Networking</option>
           </select>
         </div>
-        <div className="form-field">
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
+        {!isUpdate && (
+          <div className="form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        )}
         <div className="form-field">
           <label>Password</label>
           <input
