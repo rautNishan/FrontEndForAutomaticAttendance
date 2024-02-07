@@ -6,7 +6,19 @@
   box-sizing: border-box;
 }
 
+button {
+  cursor: pointer;
+}
 
+p{
+  text-align: center;
+}
+
+.error{
+  margin-top: 10px;
+  color: red;
+  font-size: bold;
+}
 
 .table_container {
   /* border: 2px solid black; */
@@ -18,7 +30,7 @@
   margin: auto;
   margin-top: 70px;
   position: relative;
-  z-index: 1; 
+  z-index: 1;
 }
 
 .add_new {
@@ -198,7 +210,7 @@ span {
   margin-bottom: 30px;
   /* z-index: 1000;  */
   /* position: absolute; */
-  bottom: 0; 
+  bottom: 0;
 }
 
 /* .pagination {

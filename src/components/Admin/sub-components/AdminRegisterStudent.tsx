@@ -11,7 +11,7 @@ import { AuthContext } from "../../common/Auth/Auth";
 import ConfirmModal from "../../common/Modal/ConfirmModel";
 import StudentDataModal from "./PopUpModal/AdminStudentRegisterModal";
 import "./css/Faculty.css";
-interface ITeacher {
+interface IStudent {
   _id?: string;
   name: string;
   college_id: string;
@@ -19,11 +19,8 @@ interface ITeacher {
   email: string;
   password: string;
 }
-// interface ITeacherDelete {
-//   _id?: string;
-//   name: string;
-// }
-interface ITeacherRegisterData {
+
+interface IStudentRegisterData {
   name: string;
   college_id: string;
   faculty: string;
@@ -33,8 +30,8 @@ interface ITeacherRegisterData {
 export default function RegisterStudent({ api }: { api: string }) {
   console.log("This is API: ", api);
   const token = localStorage.getItem("token");
-  const [studentList, setStudentList] = useState<ITeacher[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<ITeacher | null>(null);
+  const [studentList, setStudentList] = useState<IStudent[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<IStudent | null>(null);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   const [successMessage, setSuccessMessage] = useState(null || "");
   const [isUpdate, setIsUpdate] = useState(false);
@@ -44,12 +41,12 @@ export default function RegisterStudent({ api }: { api: string }) {
   const [totalStudent, setTotalStudent] = useState(0);
   const studentPerPage = 5;
 
-  const [isTeacherModelComponentOpen, setIsTeacherModelComponentOpen] =
+  const [isStudentModelComponentOpen, setIsStudentModelComponentOpen] =
     useState(false);
   const [errorMessage, setErrorMessage] = useState("" || null);
 
   useEffect(() => {
-    const listAllTeacherApi = `/admin/get-all-teacher?page=${currentPage}`;
+    const listAllTeacherApi = `/admin/get-all-student?page=${currentPage}`;
     const token = localStorage.getItem("token");
     console.log("This is List All Teacher Api: ", listAllTeacherApi);
     const fetchTeachers = async () => {
@@ -80,7 +77,7 @@ export default function RegisterStudent({ api }: { api: string }) {
     const token = localStorage.getItem("token");
     const searchTeacher = async () => {
       const response = await customAxios.get(
-        `admin/get-all-teacher?search_key=${searchValues}`,
+        `admin/get-all-student?search_key=${searchValues}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -99,40 +96,57 @@ export default function RegisterStudent({ api }: { api: string }) {
   //Closing Model
   const closeModel = () => {
     setSelectedStudent(null);
-    setIsTeacherModelComponentOpen(false);
+    setIsStudentModelComponentOpen(false);
     setIsDeleteModalOpen(false);
   };
 
   //Handel Register
-  const handelTeacherRegister = async (teacher: ITeacherRegisterData) => {
+  const handelRegisterStudent = async (student: IStudentRegisterData) => {
     const token = localStorage.getItem("token");
-    teacher.faculty = teacher.faculty.toUpperCase();
-    const apiToRegisterTeacher = "/admin/register-teacher";
+    student.faculty = student.faculty.toUpperCase();
+    const apiToRegisterTeacher = "/admin/register-student";
     try {
-      const response = await customAxios.post(apiToRegisterTeacher, teacher, {
+      const response = await customAxios.post(apiToRegisterTeacher, student, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      setIsStudentModelComponentOpen(false);
       console.log("This is response: ", response.data);
-      setIsTeacherModelComponentOpen(false);
-      window.location.href = "register-teacher";
+      setTotalStudent(totalStudent + 1);
+      if (totalStudent % 5 !== 0) {
+        setStudentList((prevStudent) => [...prevStudent, student]);
+      }
+      setSuccessMessage("New Student Registered Successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+        // console.log("This is Total Student: ", totalStudent);
+
+        // if (totalTeachers % 5 === 0) {
+        //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
+        // window.location.href = "register-teacher";
+        // }
+        // if (totalStudent === 5) {
+        //   window.location.href = "register-student";
+        // }
+      }, 1000);
+      // window.location.href = "register-student";
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         if (error.response.data.message == "JWT EXPIRED") {
           setUserRole("");
           setIsLoggedIn(false);
           localStorage.removeItem("token");
-          setIsTeacherModelComponentOpen(false);
+          setIsStudentModelComponentOpen(false);
         }
         setErrorMessage(error.response.data.message);
-        setIsTeacherModelComponentOpen(false);
+        setIsStudentModelComponentOpen(false);
       }
     }
   };
 
   //Delete
-  const handleDelete = (student: ITeacher) => {
+  const handleDelete = (student: IStudent) => {
     setSelectedStudent(student);
     setIsDeleteModalOpen(true);
   };
@@ -140,20 +154,35 @@ export default function RegisterStudent({ api }: { api: string }) {
   const handleDeleteTeacher = async () => {
     const id = selectedStudent?._id;
     try {
-      const response = await customAxios.delete(`/admin/delete-teacher/${id}`, {
+      const response = await customAxios.delete(`/admin/delete-student/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       console.log("This is Response: ", response.data);
       setIsDeleteModalOpen(false);
-      window.location.href = "register-teacher";
+      setStudentList((prevStudent) =>
+        prevStudent.filter((student) => student._id !== id)
+      );
+      console.log("This is Student List: ", studentList.length);
+      setTotalStudent(totalStudent - 1);
+      setSuccessMessage("Deleted Successfully");
+      //Making sure changes reflect on the page
+      setTimeout(() => {
+        setSuccessMessage("");
+        console.log("This is Student List: ", studentList.length);
+        console.log("This is Total Student: ", totalStudent - 1);
+        if (studentList.length === 5 && studentList.length > totalStudent - 1) {
+          window.location.href = "register-student";
+        }
+      }, 1000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
           setUserRole("");
           setIsLoggedIn(false);
           localStorage.removeItem("token");
+          alert(error.response.data.message);
         }
         const responseToBeSent = error.response?.data.message;
         setErrorMessage(responseToBeSent);
@@ -163,18 +192,18 @@ export default function RegisterStudent({ api }: { api: string }) {
   };
 
   //Edit
-  const handleEdit = (student: ITeacher) => {
+  const handleEdit = (student: IStudent) => {
     setIsUpdate(true);
     setSelectedStudent(student);
-    setIsTeacherModelComponentOpen(true);
+    setIsStudentModelComponentOpen(true);
   };
 
   //Save
-  const handleSave = async (incomingData: ITeacher) => {
+  const handleSave = async (incomingData: IStudent) => {
     console.log("This is Incoming Data: ", incomingData);
     console.log("This is Selected Teacher: ", selectedStudent?._id);
     incomingData.faculty = incomingData.faculty.toUpperCase();
-    const apiToUpdateTeacher = `/admin/update-teacher/${selectedStudent?._id}`;
+    const apiToUpdateTeacher = `/admin/update-student/${selectedStudent?._id}`;
     try {
       const response = await customAxios.patch(
         apiToUpdateTeacher,
@@ -187,9 +216,9 @@ export default function RegisterStudent({ api }: { api: string }) {
       );
       console.log("This is response: ", response.data);
       setSuccessMessage("Success");
-      setIsTeacherModelComponentOpen(false);
+      setIsStudentModelComponentOpen(false);
       setTimeout(() => {
-        window.location.href = "register-teacher";
+        window.location.href = "register-student";
       }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -197,18 +226,19 @@ export default function RegisterStudent({ api }: { api: string }) {
           setUserRole("");
           setIsLoggedIn(false);
           localStorage.removeItem("token");
+          alert(error.response.data.message);
         }
         const responseToBeSent = error.response?.data.message;
         setErrorMessage(responseToBeSent);
-        setIsTeacherModelComponentOpen(false);
+        setIsStudentModelComponentOpen(false);
       }
     }
   };
 
   //Add Teacher
-  const addTeacher = () => {
+  const addStudent = () => {
     setIsUpdate(false);
-    setIsTeacherModelComponentOpen(true);
+    setIsStudentModelComponentOpen(true);
   };
   //Return
   return (
@@ -225,7 +255,7 @@ export default function RegisterStudent({ api }: { api: string }) {
               className="close_button"
               onClick={() => {
                 setErrorMessage(null);
-                window.location.href = "register-teacher";
+                window.location.href = "register-student";
               }}
             >
               <span>&times;</span>
@@ -244,13 +274,13 @@ export default function RegisterStudent({ api }: { api: string }) {
         <div className="table">
           <div className="table_header">
             <p>
-              <strong>Total Teachers: {totalStudent}</strong>
+              <strong>Total students: {totalStudent}</strong>
             </p>
             <div className="sub_header">
               <button
                 title="Register Student"
                 className="add_new"
-                onClick={addTeacher}
+                onClick={addStudent}
               >
                 <FontAwesomeIcon className="add-icon" icon={faCirclePlus} />
                 Register Student
@@ -370,11 +400,11 @@ export default function RegisterStudent({ api }: { api: string }) {
         </div>
       )}
 
-      {isTeacherModelComponentOpen && <div className="modal-backdrop" />}
-      {isTeacherModelComponentOpen && (
+      {isStudentModelComponentOpen && <div className="modal-backdrop" />}
+      {isStudentModelComponentOpen && (
         <StudentDataModal
           onClose={closeModel}
-          onSave={isUpdate ? handleSave : handelTeacherRegister}
+          onSave={isUpdate ? handleSave : handelRegisterStudent}
           isUpdate={isUpdate}
           initialData={isUpdate ? selectedStudent : null}
         />

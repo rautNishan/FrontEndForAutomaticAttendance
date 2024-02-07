@@ -6,7 +6,8 @@ import customAxios from "../../../apis/axios";
 import { AuthContext } from "../../common/Auth/Auth";
 import ConfirmModal from "../../common/Modal/ConfirmModel";
 import "./css/Faculty.css";
-import TeacherOptionModal from "./PopUpModal/TeacherOptionsModal";
+import AssignOptionModal from "./PopUpModal/TeacherOptionsModal";
+import { SectionDetail } from "./PopUpModal/SectionDetails";
 interface ISection {
   _id: string;
   section: string;
@@ -19,6 +20,7 @@ interface ISectionEdit {
 }
 export default function Section() {
   const [sectionName, setSectionName] = useState("");
+  const [role, setRole] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [sectionList, setSectionList] = useState<ISection[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
@@ -27,6 +29,8 @@ export default function Section() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAssignModel, setIsAssignModalOpen] = useState(false);
   const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
+  const [isViewDetailsModal, setIsViewDetailsModal] = useState(false);
+
   const [selectedSection, setSelectedSection] = useState<ISectionEdit | null>(
     null
   );
@@ -44,7 +48,8 @@ export default function Section() {
     if (successMessage) {
       const timer = setTimeout(() => {
         setSuccessMessage("");
-      }, 2000);
+        window.location.href = "section";
+      }, 1000);
       return () => {
         clearTimeout(timer);
       };
@@ -87,12 +92,10 @@ export default function Section() {
     setIsAssignModalOpen(true);
   };
 
-  const saveAssignTeacher = async (teacherId: string) => {
-    console.log("This is Teacher: ", teacherId);
-    console.log("This is Section: ", selectedSection?.section);
+  const saveAssignUser = async (id: string) => {
     try {
       const response = await customAxios.patch(
-        `admin/update-teacher/${teacherId}`,
+        `admin/update-${role}/${id}`,
         { section: selectedSection?.section },
         {
           headers: {
@@ -101,7 +104,7 @@ export default function Section() {
         }
       );
       console.log("This is Response: ", response.data);
-      setSuccessMessage("Teacher Assigned Successfully");
+      setSuccessMessage("Assigned Successfully");
       setIsAssignModalOpen(false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -109,10 +112,38 @@ export default function Section() {
           setUserRole("");
           setIsLoggedIn(false);
           localStorage.removeItem("token");
+          alert(error.response.data.message);
         }
         const responseToBeSent = error.response?.data.message;
         setErrorMessage(responseToBeSent);
         setIsAssignModalOpen(false);
+      }
+    }
+  };
+
+  const deleteSectionFromUser = async (id: string) => {
+    try {
+      console.log("This is Role: ", role);
+      const response = customAxios.patch(
+        `admin/delete-${role}-section/${id}`,
+        { section: selectedSection?.section },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("This is Response: ", response);
+      setSuccessMessage("Deleted Successfully");
+      setIsViewDetailsModal(false);
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        if (error.response.status === 401) {
+          setUserRole("");
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+          alert(error.response.data.message);
+        }
       }
     }
   };
@@ -194,13 +225,19 @@ export default function Section() {
       }
     }
   }
+
+  const handleViewDetailAboutSection = (section: ISectionEdit) => {
+    console.log("This is Section: ", section);
+    setSelectedSection(section);
+    setIsViewDetailsModal(true);
+  };
+
   return (
     <>
       <div className="table_container">
         {errorMessage && (
           <div className="error_container">
             <div className="error_message">
-              {/* <p>{errorMessage}</p> */}
               <strong>{errorMessage}</strong>
             </div>
 
@@ -218,7 +255,6 @@ export default function Section() {
         {successMessage && (
           <div className="success_container">
             <div className="success_message">
-              {/* <p>{errorMessage}</p> */}
               <strong>{successMessage}</strong>
 
               <button
@@ -268,33 +304,36 @@ export default function Section() {
                   <th>Student Count</th>
                   <th>Actions</th>
                   <th>Assign Teacher</th>
+                  <th>Assign Student</th>
                 </tr>
               </thead>
               <tbody>
                 {sectionList.map((section) => (
                   <tr key={section.section}>
-                    {/* key={faculty.name} */}
                     <td>
                       <strong>{section.section}</strong>
                     </td>
                     <td>
-                      <strong>{section.teacherCounts}</strong>
-                    </td>
-                    <td>
-                      <strong>{section.studentCounts}</strong>
-                    </td>
-                    {/* <td>{faculty.teacherCount}</td> 
-                  <td>{faculty.studentCount}</td>  */}
-                    <td>
-                      {/* <button
-                        className="edit_button"
-                        title="Edit Faculty"
-                        onClick={() =>
-                          handleEdit({ name: faculty.name, _id: faculty._id })
-                        }
+                      <button
+                        onClick={() => {
+                          setRole("teacher");
+                          handleViewDetailAboutSection(section);
+                        }}
                       >
-                        <FontAwesomeIcon className="icon" icon={faEdit} />
-                      </button> */}
+                        <strong>{section.teacherCounts}</strong>
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          setRole("student");
+                          handleViewDetailAboutSection(section);
+                        }}
+                      >
+                        <strong>{section.studentCounts}</strong>
+                      </button>
+                    </td>
+                    <td>
                       <button
                         title="Delete Section"
                         className="delete_button"
@@ -312,17 +351,30 @@ export default function Section() {
                       <button
                         title="Assign Teacher"
                         className="add_new"
-                        onClick={() =>
+                        onClick={() => {
+                          setRole("teacher");
                           handleAssign({
                             section: section.section,
                             _id: section._id,
-                          })
-                        }
+                          });
+                        }}
                       >
-                        <FontAwesomeIcon
-                          className="add-icon"
-                          icon={faCirclePlus}
-                        />
+                        Assign Teacher
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        title="Assign student"
+                        className="add_new"
+                        onClick={() => {
+                          setRole("student");
+                          handleAssign({
+                            section: section.section,
+                            _id: section._id,
+                          });
+                        }}
+                      >
+                        Assign Student
                       </button>
                     </td>
                   </tr>
@@ -369,10 +421,10 @@ export default function Section() {
       )}
       {isAssignModel && <div className="modal-backdrop" />}
       {isAssignModel && selectedSection && (
-        <TeacherOptionModal
-          // data={selectedFaculty}
+        <AssignOptionModal
+          role={role}
           onClose={() => setIsAssignModalOpen(false)}
-          onSave={saveAssignTeacher}
+          onSave={saveAssignUser}
         />
       )}
       {isDeleteModel && <div className="modal-backdrop" />}
@@ -381,6 +433,16 @@ export default function Section() {
           data={selectedSection}
           onClose={() => setIsDeleteModalOpen(false)}
           onSave={handleDeleteSection}
+        />
+      )}
+
+      {isViewDetailsModal && <div className="modal-backdrop" />}
+      {isViewDetailsModal && selectedSection && (
+        <SectionDetail
+          role={role}
+          sectionData={selectedSection}
+          onClose={() => setIsViewDetailsModal(false)}
+          onSave={deleteSectionFromUser}
         />
       )}
     </>

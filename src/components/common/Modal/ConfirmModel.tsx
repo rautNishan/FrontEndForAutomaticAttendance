@@ -6,6 +6,7 @@ interface IData {
   faculty?: string;
   email?: string;
   password?: string;
+  section?: string;
 }
 interface ModalProps {
   data: IData;
@@ -14,8 +15,8 @@ interface ModalProps {
 }
 
 export default function ConfirmModal({ data, onClose, onSave }: ModalProps) {
-  const [updatedName, setUpdatedName] = useState(data.name);
-  const fixedName = data.name;
+  const [updatedName, setUpdatedName] = useState(data?.name || data?.section);
+  const fixedName = data?.name || data?.section;
   const id = data._id;
   console.log("This is id: ", id);
   console.log("This is Updated Name Updated name: ", updatedName);

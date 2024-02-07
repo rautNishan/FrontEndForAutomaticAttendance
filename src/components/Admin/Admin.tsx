@@ -6,11 +6,11 @@ import NavBar from "../common/Nav/NavBar";
 import PageNotFound from "../common/PageNotFound/PageNotFound";
 import Home from "../common/home/Home";
 import Login from "../common/login/Login";
-import AdminDashBoard from "./sub-components/AdminDashBoard";
-import RegisterTeacher from "./sub-components/AdminRegisterTeacher";
-import RegisterStudent from "./sub-components/AdminRegisterStudent";
-import Faculties from "./sub-components/AdminFaculties";
 import "./Admin.css";
+import AdminDashBoard from "./sub-components/AdminDashBoard";
+import Faculties from "./sub-components/AdminFaculties";
+import RegisterStudent from "./sub-components/AdminRegisterStudent";
+import RegisterTeacher from "./sub-components/AdminRegisterTeacher";
 import Section from "./sub-components/AdminSection";
 export default function Admin() {
   const adminLoginApi = "/admin/login";

@@ -59,7 +59,10 @@ export default function RegisterTeacher({ api }: { api: string }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response.data.data.totalCount);
+        console.log(
+          "Total Count of Teacher from Response:",
+          response.data.data.totalCount
+        );
         setTotalTeachers(response.data.data.totalCount);
         console.log("This is Response: ", response.data.data.teachers);
         setTeacherList(response.data.data.teachers);
@@ -114,9 +117,23 @@ export default function RegisterTeacher({ api }: { api: string }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("This is response: ", response.data);
+      console.log("This is Response: ", response.data);
       setIsTeacherModelComponentOpen(false);
-      window.location.href = "register-teacher";
+      console.log("This is Total Teacher in Register: ", totalTeachers);
+      setTotalTeachers(totalTeachers + 1);
+      console.log("This is Total Teacher in Register after: ", totalTeachers);
+      if (totalTeachers % 5 !== 0) {
+        setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
+      }
+      setSuccessMessage("New Teacher Registered Successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+        // if (totalTeachers % 5 === 0) {
+        //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
+        //   // window.location.href = "register-teacher";
+        // }
+      }, 1000);
+      // window.location.href = "register-teacher";
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
         if (error.response.data.message == "JWT EXPIRED") {
@@ -127,6 +144,9 @@ export default function RegisterTeacher({ api }: { api: string }) {
         }
         setErrorMessage(error.response.data.message);
         setIsTeacherModelComponentOpen(false);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1200);
       }
     }
   };
@@ -146,8 +166,29 @@ export default function RegisterTeacher({ api }: { api: string }) {
         },
       });
       console.log("This is Response: ", response.data);
+      setTeacherList((prevTeachers) =>
+        prevTeachers.filter((teacher) => teacher._id !== id)
+      );
+      setTotalTeachers(totalTeachers - 1);
+      // if ((totalTeachers - 1) % 5 === 0) {
+      //   window.location.href = "register-teacher";
+      // }
+      setSuccessMessage("Deleted Successfully");
       setIsDeleteModalOpen(false);
-      window.location.href = "register-teacher";
+      console.log("This is length of teacher: ", teacherList.length);
+      console.log("This is Total Teachers: ", totalTeachers - 1);
+
+      setTimeout(() => {
+        setSuccessMessage("");
+        if (
+          // teacherList.length === 1 ||
+          teacherList.length === 5 &&
+          (totalTeachers - 1) % 5 === 0
+        ) {
+          console.log("Yes length is 1 or 5");
+          window.location.href = "register-teacher";
+        }
+      }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -186,10 +227,15 @@ export default function RegisterTeacher({ api }: { api: string }) {
         }
       );
       console.log("This is response: ", response.data);
-      setSuccessMessage("Success");
+      setTeacherList((prevTeachers) =>
+        prevTeachers.map((teacher) =>
+          teacher._id === selectedTeacher?._id ? incomingData : teacher
+        )
+      );
+      setSuccessMessage("Updated Success");
       setIsTeacherModelComponentOpen(false);
       setTimeout(() => {
-        window.location.href = "register-teacher";
+        setSuccessMessage("");
       }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -334,7 +380,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
           </div>
         </div>
       </div>
-      {totalTeachers > teachersPerPage && (
+      {totalTeachers >= teachersPerPage && (
         <div className="pagination">
           <ul className="pagination-ul">
             <li className="page-item">

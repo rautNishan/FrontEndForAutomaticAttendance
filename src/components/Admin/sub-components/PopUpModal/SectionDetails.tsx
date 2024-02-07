@@ -1,13 +1,18 @@
-import { useContext, useEffect, useState } from "react";
-import "./ModalCssForAdmin/RegisterModal.css";
-import customAxios from "../../../../apis/axios";
-import { AxiosError } from "axios";
-import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { AxiosError } from "axios";
+import { useContext, useEffect, useState } from "react";
+import customAxios from "../../../../apis/axios";
 import { AuthContext } from "../../../common/Auth/Auth";
 import "../css/Faculty.css";
+interface ISectionEdit {
+  _id: string;
+  section: string;
+}
+
 interface ModalProps {
   role: string;
+  sectionData: ISectionEdit;
   onClose: () => void;
   onSave: (id: string) => void;
 }
@@ -19,48 +24,74 @@ interface ITeacher {
   email: string;
   password: string;
 }
-
-export default function AssignOptionModal({role, onClose, onSave }: ModalProps) {
-  const [totalTeachers, setTotalTeachers] = useState(0);
+export function SectionDetail({
+  role,
+  sectionData,
+  onClose,
+  onSave,
+}: ModalProps) {
+  const [userList, setUserList] = useState<ITeacher[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchValues, setSearchValues] = useState(null || "");
-  const [teacherList, setTeacherList] = useState<ITeacher[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
+  const [searchValues, setSearchValues] = useState(null || "");
+  const [message, setMessage] = useState("");
   const teachersPerPage = 5;
 
+  const deleteUserFromSection = (id: string) => {
+    try {
+      onSave(id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //Get all teacher or students
   useEffect(() => {
-    const listAllTeacherApi = `/admin/get-all-${role}?page=${currentPage}`;
+    const listAllUserApi = `admin/get-all-${role}/${sectionData.section}?page=${currentPage}`;
     const token = localStorage.getItem("token");
-    console.log("This is List All Teacher Api: ", listAllTeacherApi);
     const fetchTeachers = async () => {
       try {
-        const response = await customAxios.get(listAllTeacherApi, {
+        const response = await customAxios.get(listAllUserApi, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         console.log(response.data.data.totalCount);
-        setTotalTeachers(response.data.data.totalCount);
+        if (response.data.data.totalCount === 0) {
+          setMessage(`No ${role} found in this section`);
+        }
+        setTotalUsers(response.data.data.totalCount);
         console.log("This is Response: ", response.data.data.teachers);
-        setTeacherList(response.data.data.teachers);
+        setUserList(response.data.data.teachers);
       } catch (error) {
-        setUserRole("");
-        setIsLoggedIn(false);
-        localStorage.removeItem("token");
         if (error instanceof AxiosError && error.response) {
-          alert(error.response.data.message);
+          if (error.response.status === 401) {
+            //401 is Unauthorized from my backend
+            setUserRole("");
+            setIsLoggedIn(false);
+            localStorage.removeItem("token");
+            alert(error.response.data.message);
+          }
         }
       }
     };
     fetchTeachers();
-  }, [setUserRole, setIsLoggedIn, currentPage, setTotalTeachers,role]);
+  }, [
+    setUserRole,
+    setIsLoggedIn,
+    currentPage,
+    setTotalUsers,
+    sectionData.section,
+    role,
+  ]);
 
-  // Search teachers when searchValues changes
+  // Search teacher or student when searchValues changes
   useEffect(() => {
     const token = localStorage.getItem("token");
     const searchTeacher = async () => {
       const response = await customAxios.get(
-        `admin/get-all-${role}?search_key=${searchValues}`,
+        `admin/get-all-${role}/${sectionData.section}?search_key=${searchValues}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -70,16 +101,13 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
       const responseData = response.data.data.teachers;
       console.log("This is Search");
 
-      setTeacherList(responseData);
+      setUserList(responseData);
     };
     if (searchValues != "" || searchValues != null) {
       searchTeacher();
     }
-  }, [searchValues,role]);
+  }, [searchValues, sectionData.section, role]);
 
-  const addSection = async (_id: string) => {
-    onSave(_id);
-  };
   return (
     <>
       <div className="popup-modal-container">
@@ -87,22 +115,27 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
           <div className="table">
             <div className="table_header">
               <p>
-                <strong>Total Teachers: {totalTeachers}</strong>
+                <strong>
+                  Total {role}: {totalUsers}
+                </strong>
               </p>
               <div className="sub_header">
                 <input
-                  placeholder="Search Teacher"
+                  placeholder={`Search ${role}`}
                   value={searchValues}
                   onChange={(e) => setSearchValues(e.target.value)}
                   required
                 />
               </div>
             </div>
+            <p className="error">{message}</p>
             <div className="table_body">
               <table>
                 <thead>
                   <tr>
-                    <th>Teacher Name</th>
+                    <th>
+                      {role === "teacher" ? "Teacher Name" : "Student Name"}
+                    </th>
                     <th>Faculty</th>
                     <th>Email</th>
                     <th>College Id</th>
@@ -110,34 +143,33 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
                   </tr>
                 </thead>
                 <tbody>
-                  {teacherList.map((teacher) => (
-                    <tr key={teacher.name}>
+                  {userList.map((user) => (
+                    <tr key={user.name}>
                       {/* key={faculty.name} */}
                       <td>
-                        <strong>{teacher.name}</strong>
+                        <strong>{user.name}</strong>
                       </td>
                       <td>
                         {" "}
-                        <strong>{teacher.faculty}</strong>
+                        <strong>{user.faculty}</strong>
                       </td>
                       <td>
-                        <strong>{teacher.email}</strong>
+                        <strong>{user.email}</strong>
                       </td>
                       <td>
-                        <strong>{teacher.college_id}</strong>
+                        <strong>{user.college_id}</strong>
                       </td>
                       {/* <td>{faculty.teacherCount}</td> 
                   <td>{faculty.studentCount}</td>  */}
                       <td>
                         <button
-                          className="edit_button"
-                          title="Edit Faculty"
-                          onClick={() => addSection(teacher._id || "")}
+                          className="delete_button"
+                          title="Delete teacher from section"
+                          onClick={() =>
+                            deleteUserFromSection(user._id || "")
+                          }
                         >
-                          <FontAwesomeIcon
-                            className="icon"
-                            icon={faCirclePlus}
-                          />
+                          <FontAwesomeIcon className="icon" icon={faTrashAlt} />
                         </button>
                       </td>
                     </tr>
@@ -146,7 +178,7 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
               </table>
             </div>
           </div>
-          {totalTeachers > teachersPerPage && (
+          {totalUsers > teachersPerPage && (
             <div className="pagination">
               <ul className="pagination-ul">
                 <li className="page-item">
@@ -165,17 +197,16 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
                 <li className="page-item">
                   <button
                     className={`page-link ${
-                      currentPage === Math.ceil(totalTeachers / teachersPerPage)
+                      currentPage === Math.ceil(totalUsers / teachersPerPage)
                         ? "disabled"
                         : ""
                     }`}
                     onClick={() =>
-                      currentPage <
-                        Math.ceil(totalTeachers / teachersPerPage) &&
+                      currentPage < Math.ceil(totalUsers / teachersPerPage) &&
                       setCurrentPage(currentPage + 1)
                     }
                     disabled={
-                      currentPage === Math.ceil(totalTeachers / teachersPerPage)
+                      currentPage === Math.ceil(totalUsers / teachersPerPage)
                     }
                   >
                     Next
