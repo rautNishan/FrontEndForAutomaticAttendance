@@ -114,7 +114,7 @@ export default function RegisterStudent({ api }: { api: string }) {
       setIsStudentModelComponentOpen(false);
       console.log("This is response: ", response.data);
       setTotalStudent(totalStudent + 1);
-      if (totalStudent % 5 !== 0) {
+      if (studentList.length < 5 || totalStudent === 0) {
         setStudentList((prevStudent) => [...prevStudent, student]);
       }
       setSuccessMessage("New Student Registered Successfully");
@@ -172,7 +172,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         setSuccessMessage("");
         console.log("This is Student List: ", studentList.length);
         console.log("This is Total Student: ", totalStudent - 1);
-        if (studentList.length === 5 && studentList.length > totalStudent - 1) {
+        if (studentList.length === 5 && (totalStudent - 1) % 5 === 0) {
           window.location.href = "register-student";
         }
       }, 1000);
@@ -364,7 +364,7 @@ export default function RegisterStudent({ api }: { api: string }) {
           </div>
         </div>
       </div>
-      {totalStudent > studentPerPage && (
+      {totalStudent >= studentPerPage && (
         <div className="pagination">
           <ul className="pagination-ul">
             <li className="page-item">

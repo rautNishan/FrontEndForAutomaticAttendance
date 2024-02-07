@@ -44,25 +44,27 @@ export default function Section() {
   };
 
   //Only Display Success or Error Message for 3 seconds
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage("");
-        window.location.href = "section";
-      }, 1000);
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-    if (errorMessage) {
-      const timer = setTimeout(() => {
-        setErrorMessage(null);
-      }, 2000);
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [successMessage, errorMessage]);
+  // useEffect(() => {
+  //   if (successMessage) {
+  //     const timer = setTimeout(() => {
+  //       setSuccessMessage("");
+  //       window.location.href = "section";
+  //     }, 1000);
+  //     return () => {
+  //       clearTimeout(timer);
+  //     };
+  //   }
+  //   if (errorMessage) {
+  //     const timer = setTimeout(() => {
+  //       setErrorMessage(null);
+  //     }, 2000);
+  //     return () => {
+  //       clearTimeout(timer);
+  //     };
+  //   }
+  // }, [successMessage, errorMessage]);
+
+  //Delete Section
   const handleDeleteSection = async () => {
     const id = selectedSection?._id;
     try {
@@ -72,8 +74,21 @@ export default function Section() {
         },
       });
       console.log("This is Response: ", response.data);
+      setSectionList((prevSection) =>
+        prevSection.filter((section) => section._id !== id)
+      );
+      setTotalSection(totalSection - 1);
       setIsDeleteModalOpen(false);
-      window.location.href = "section";
+      setSuccessMessage("Deleted Successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+        console.log("This is Total Section: ", totalSection);
+        console.log("This is Total Section -1: ", totalSection - 1);
+
+        if (sectionList.length === 5 && (totalSection - 1) % 5 === 0) {
+          window.location.href = "section";
+        }
+      }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -84,6 +99,9 @@ export default function Section() {
         const responseToBeSent = error.response?.data.message;
         setErrorMessage(responseToBeSent);
         setIsDeleteModalOpen(false);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1000);
       }
     }
   };
@@ -92,61 +110,66 @@ export default function Section() {
     setIsAssignModalOpen(true);
   };
 
-  const saveAssignUser = async (id: string) => {
-    try {
-      const response = await customAxios.patch(
-        `admin/update-${role}/${id}`,
-        { section: selectedSection?.section },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log("This is Response: ", response.data);
-      setSuccessMessage("Assigned Successfully");
-      setIsAssignModalOpen(false);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.data.message == "JWT EXPIRED") {
-          setUserRole("");
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-          alert(error.response.data.message);
-        }
-        const responseToBeSent = error.response?.data.message;
-        setErrorMessage(responseToBeSent);
-        setIsAssignModalOpen(false);
-      }
-    }
-  };
+  //Assign User into Section
+  // const saveAssignUser = async (id: string) => {
+  //   try {
+  //     const response = await customAxios.patch(
+  //       `admin/update-${role}/${id}`,
+  //       { section: selectedSection?.section },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("This is Response: ", response.data);
+  //     setIsAssignModalOpen(false);
+  //     setSuccessMessage("Assigned Successfully");
+  //     setTimeout(() => {
+  //       window.location.href = "section";
+  //     }, 1000);
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.response?.data.message == "JWT EXPIRED") {
+  //         setUserRole("");
+  //         setIsLoggedIn(false);
+  //         localStorage.removeItem("token");
+  //         alert(error.response.data.message);
+  //       }
+  //       const responseToBeSent = error.response?.data.message;
+  //       setErrorMessage(responseToBeSent);
+  //       setIsAssignModalOpen(false);
+  //     }
+  //   }
+  // };
 
-  const deleteSectionFromUser = async (id: string) => {
-    try {
-      console.log("This is Role: ", role);
-      const response = customAxios.patch(
-        `admin/delete-${role}-section/${id}`,
-        { section: selectedSection?.section },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log("This is Response: ", response);
-      setSuccessMessage("Deleted Successfully");
-      setIsViewDetailsModal(false);
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          setUserRole("");
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-          alert(error.response.data.message);
-        }
-      }
-    }
-  };
+  // //Delete Section from User
+  // const deleteSectionFromUser = async (id: string) => {
+  //   try {
+  //     console.log("This is Role: ", role);
+  //     const response = customAxios.patch(
+  //       `admin/delete-${role}-section/${id}`,
+  //       { section: selectedSection?.section },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("This is Response: ", response);
+  //     setSuccessMessage("Deleted Successfully");
+  //     setIsViewDetailsModal(false);
+  //   } catch (error) {
+  //     if (error instanceof AxiosError && error.response) {
+  //       if (error.response.status === 401) {
+  //         setUserRole("");
+  //         setIsLoggedIn(false);
+  //         localStorage.removeItem("token");
+  //         alert(error.response.data.message);
+  //       }
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -202,6 +225,7 @@ export default function Section() {
     }
   }, [searchValues]);
 
+  //Add Section
   async function addSection() {
     const token = localStorage.getItem("token");
     const dataToSend = sectionName.toUpperCase();
@@ -217,11 +241,32 @@ export default function Section() {
           },
         }
       );
-      console.log("THis is Response: ", response.data);
-      window.location.href = "section";
+      setTotalSection(totalSection + 1);
+      if (sectionList.length < 5 || totalSection === 0) {
+        setSectionList((prevSection) => [...prevSection, response.data.data]);
+      }
+      setSuccessMessage("New Section Registered Successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+        // if (totalTeachers % 5 === 0) {
+        //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
+        //   // window.location.href = "register-teacher";
+        // }
+      }, 1000);
+      // window.location.href = "section";
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setErrorMessage(error.response?.data.message);
+        if (error.response?.data.message == "JWT EXPIRED") {
+          setUserRole("");
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+        }
+        const responseToBeSent = error.response?.data.message;
+        setErrorMessage(responseToBeSent);
+        setIsDeleteModalOpen(false);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1000);
       }
     }
   }
@@ -384,7 +429,7 @@ export default function Section() {
           </div>
         </div>
       </div>
-      {totalSection > sectionPerPage && (
+      {totalSection >= sectionPerPage && (
         <div className="pagination">
           <ul className="pagination-ul">
             <li className="page-item">
@@ -423,8 +468,12 @@ export default function Section() {
       {isAssignModel && selectedSection && (
         <AssignOptionModal
           role={role}
-          onClose={() => setIsAssignModalOpen(false)}
-          onSave={saveAssignUser}
+          selectedSection={selectedSection}
+          onClose={() => {
+            setIsAssignModalOpen(false);
+            window.location.href = "section";
+          }}
+          // onSave={saveAssignUser}
         />
       )}
       {isDeleteModel && <div className="modal-backdrop" />}
@@ -441,8 +490,11 @@ export default function Section() {
         <SectionDetail
           role={role}
           sectionData={selectedSection}
-          onClose={() => setIsViewDetailsModal(false)}
-          onSave={deleteSectionFromUser}
+          onClose={() => {
+            setIsViewDetailsModal(false);
+            window.location.href = "section";
+          }}
+          // onSave={deleteSectionFromUser}
         />
       )}
     </>

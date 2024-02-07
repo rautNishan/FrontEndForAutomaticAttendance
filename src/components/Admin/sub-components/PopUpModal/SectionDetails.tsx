@@ -14,7 +14,7 @@ interface ModalProps {
   role: string;
   sectionData: ISectionEdit;
   onClose: () => void;
-  onSave: (id: string) => void;
+  // onSave: (id: string) => void;
 }
 interface ITeacher {
   _id?: string;
@@ -28,21 +28,50 @@ export function SectionDetail({
   role,
   sectionData,
   onClose,
-  onSave,
-}: ModalProps) {
+}: // onSave,
+ModalProps) {
   const [userList, setUserList] = useState<ITeacher[]>([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   const [searchValues, setSearchValues] = useState(null || "");
   const [message, setMessage] = useState("");
-  const teachersPerPage = 5;
+  const [successMessage, setSuccessMessage] = useState(null || "");
+  const usersPerPage = 5;
 
   const deleteUserFromSection = (id: string) => {
     try {
-      onSave(id);
+      console.log("This is Role: ", role);
+      const response = customAxios.patch(
+        `admin/delete-${role}-section/${id}`,
+        { section: sectionData?.section },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("This is Response: ", response);
+      setUserList((prevUsers) => prevUsers.filter((user) => user._id !== id));
+      setTotalUsers(totalUsers - 1);
+      setSuccessMessage("Deleted Successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+        if (userList.length === 5 && (totalUsers - 1) % 5 === 0) {
+          console.log("Yes length is 1 or 5");
+          window.location.href = "register-teacher";
+        }
+      }, 1200);
+      // setIsViewDetailsModal(false);
     } catch (error) {
-      console.log(error);
+      if (error instanceof AxiosError && error.response) {
+        if (error.response.status === 401) {
+          setUserRole("");
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+          alert(error.response.data.message);
+        }
+      }
     }
   };
 
@@ -113,6 +142,20 @@ export function SectionDetail({
       <div className="popup-modal-container">
         <div className="popup-options-modal ">
           <div className="table">
+            {successMessage && (
+                <div className="success_message">
+                  <strong>{successMessage}</strong>
+
+                  <button
+                    className="close_button"
+                    onClick={() => {
+                      setSuccessMessage("");
+                    }}
+                  >
+                    <span>&times;</span>
+                  </button>
+                </div>
+            )}
             <div className="table_header">
               <p>
                 <strong>
@@ -165,9 +208,7 @@ export function SectionDetail({
                         <button
                           className="delete_button"
                           title="Delete teacher from section"
-                          onClick={() =>
-                            deleteUserFromSection(user._id || "")
-                          }
+                          onClick={() => deleteUserFromSection(user._id || "")}
                         >
                           <FontAwesomeIcon className="icon" icon={faTrashAlt} />
                         </button>
@@ -178,7 +219,7 @@ export function SectionDetail({
               </table>
             </div>
           </div>
-          {totalUsers > teachersPerPage && (
+          {totalUsers >= usersPerPage && (
             <div className="pagination">
               <ul className="pagination-ul">
                 <li className="page-item">
@@ -197,16 +238,16 @@ export function SectionDetail({
                 <li className="page-item">
                   <button
                     className={`page-link ${
-                      currentPage === Math.ceil(totalUsers / teachersPerPage)
+                      currentPage === Math.ceil(totalUsers / usersPerPage)
                         ? "disabled"
                         : ""
                     }`}
                     onClick={() =>
-                      currentPage < Math.ceil(totalUsers / teachersPerPage) &&
+                      currentPage < Math.ceil(totalUsers / usersPerPage) &&
                       setCurrentPage(currentPage + 1)
                     }
                     disabled={
-                      currentPage === Math.ceil(totalUsers / teachersPerPage)
+                      currentPage === Math.ceil(totalUsers / usersPerPage)
                     }
                   >
                     Next

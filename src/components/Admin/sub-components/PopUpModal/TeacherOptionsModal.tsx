@@ -1,15 +1,19 @@
 import { useContext, useEffect, useState } from "react";
 import "./ModalCssForAdmin/RegisterModal.css";
 import customAxios from "../../../../apis/axios";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AuthContext } from "../../../common/Auth/Auth";
 import "../css/Faculty.css";
+interface ISectionEdit {
+  _id: string;
+  section: string;
+}
 interface ModalProps {
   role: string;
+  selectedSection: ISectionEdit;
   onClose: () => void;
-  onSave: (id: string) => void;
 }
 interface ITeacher {
   _id?: string;
@@ -20,27 +24,34 @@ interface ITeacher {
   password: string;
 }
 
-export default function AssignOptionModal({role, onClose, onSave }: ModalProps) {
-  const [totalTeachers, setTotalTeachers] = useState(0);
+export default function AssignOptionModal({
+  role,
+  selectedSection,
+  onClose,
+}: ModalProps) {
+  const [totalUser, setTotalUser] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValues, setSearchValues] = useState(null || "");
   const [teacherList, setTeacherList] = useState<ITeacher[]>([]);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
+  const [successMessage, setSuccessMessage] = useState(null || "");
+  const [errorMessage, setErrorMessage] = useState(null);
+
   const teachersPerPage = 5;
 
   useEffect(() => {
-    const listAllTeacherApi = `/admin/get-all-${role}?page=${currentPage}`;
+    const listAllUserAccordingToSectionApi = `/admin/get-all-${role}?page=${currentPage}`;
     const token = localStorage.getItem("token");
-    console.log("This is List All Teacher Api: ", listAllTeacherApi);
+    console.log("This is List All Teacher Api: ", listAllUserAccordingToSectionApi);
     const fetchTeachers = async () => {
       try {
-        const response = await customAxios.get(listAllTeacherApi, {
+        const response = await customAxios.get(listAllUserAccordingToSectionApi, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         console.log(response.data.data.totalCount);
-        setTotalTeachers(response.data.data.totalCount);
+        setTotalUser(response.data.data.totalCount);
         console.log("This is Response: ", response.data.data.teachers);
         setTeacherList(response.data.data.teachers);
       } catch (error) {
@@ -53,7 +64,7 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
       }
     };
     fetchTeachers();
-  }, [setUserRole, setIsLoggedIn, currentPage, setTotalTeachers,role]);
+  }, [setUserRole, setIsLoggedIn, currentPage, setTotalUser, role]);
 
   // Search teachers when searchValues changes
   useEffect(() => {
@@ -75,19 +86,77 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
     if (searchValues != "" || searchValues != null) {
       searchTeacher();
     }
-  }, [searchValues,role]);
+  }, [searchValues, role]);
 
-  const addSection = async (_id: string) => {
-    onSave(_id);
+  const addSection = async (id: string) => {
+    try {
+      const response = await customAxios.patch(
+        `admin/update-${role}/${id}`,
+        { section: selectedSection?.section },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log("This is Response: ", response.data);
+      setSuccessMessage("Assigned Successfully");
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 1000);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.data.message == "JWT EXPIRED") {
+          setUserRole("");
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+          alert(error.response.data.message);
+        }
+        const responseToBeSent = error.response?.data.message;
+        console.log("This is Error: ", responseToBeSent);
+        setErrorMessage(responseToBeSent);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1000);
+      }
+    }
   };
   return (
     <>
       <div className="popup-modal-container">
         <div className="popup-options-modal ">
+          {errorMessage && (
+            <div className="error_message">
+              <strong>{errorMessage}</strong>
+
+              <button
+                className="close_button"
+                onClick={() => {
+                  setErrorMessage(null);
+                }}
+              >
+                <span>&times;</span>
+              </button>
+            </div>
+          )}
+          {successMessage && (
+            <div className="success_message">
+              <strong>{successMessage}</strong>
+
+              <button
+                className="close_button"
+                onClick={() => {
+                  setSuccessMessage("");
+                }}
+              >
+                <span>&times;</span>
+              </button>
+            </div>
+          )}
           <div className="table">
             <div className="table_header">
               <p>
-                <strong>Total Teachers: {totalTeachers}</strong>
+                <strong>Total Teachers: {totalUser}</strong>
               </p>
               <div className="sub_header">
                 <input
@@ -131,7 +200,7 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
                       <td>
                         <button
                           className="edit_button"
-                          title="Edit Faculty"
+                          title="Assign Teacher to Section"
                           onClick={() => addSection(teacher._id || "")}
                         >
                           <FontAwesomeIcon
@@ -146,7 +215,7 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
               </table>
             </div>
           </div>
-          {totalTeachers > teachersPerPage && (
+          {totalUser > teachersPerPage && (
             <div className="pagination">
               <ul className="pagination-ul">
                 <li className="page-item">
@@ -165,17 +234,16 @@ export default function AssignOptionModal({role, onClose, onSave }: ModalProps) 
                 <li className="page-item">
                   <button
                     className={`page-link ${
-                      currentPage === Math.ceil(totalTeachers / teachersPerPage)
+                      currentPage === Math.ceil(totalUser / teachersPerPage)
                         ? "disabled"
                         : ""
                     }`}
                     onClick={() =>
-                      currentPage <
-                        Math.ceil(totalTeachers / teachersPerPage) &&
+                      currentPage < Math.ceil(totalUser / teachersPerPage) &&
                       setCurrentPage(currentPage + 1)
                     }
                     disabled={
-                      currentPage === Math.ceil(totalTeachers / teachersPerPage)
+                      currentPage === Math.ceil(totalUser / teachersPerPage)
                     }
                   >
                     Next

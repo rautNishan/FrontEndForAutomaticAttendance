@@ -176,12 +176,16 @@ span {
 
 .error_message {
   padding: 8px;
+  background-color: #f8d7da;
 }
 
 .success_message {
   text-align: center;
   padding: 8px;
+  background-color: #d4edda;
 }
+
+
 .icon {
   height: 2.5vh;
 }

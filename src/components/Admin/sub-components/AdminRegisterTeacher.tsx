@@ -121,8 +121,11 @@ export default function RegisterTeacher({ api }: { api: string }) {
       setIsTeacherModelComponentOpen(false);
       console.log("This is Total Teacher in Register: ", totalTeachers);
       setTotalTeachers(totalTeachers + 1);
-      console.log("This is Total Teacher in Register after: ", totalTeachers);
-      if (totalTeachers % 5 !== 0) {
+      console.log(
+        "This is Total TeacherList in Register after: ",
+        teacherList.length
+      );
+      if (teacherList.length < 5 || totalTeachers === 0) {
         setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
       }
       setSuccessMessage("New Teacher Registered Successfully");
@@ -181,7 +184,6 @@ export default function RegisterTeacher({ api }: { api: string }) {
       setTimeout(() => {
         setSuccessMessage("");
         if (
-          // teacherList.length === 1 ||
           teacherList.length === 5 &&
           (totalTeachers - 1) % 5 === 0
         ) {
