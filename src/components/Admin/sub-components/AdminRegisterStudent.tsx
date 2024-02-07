@@ -215,10 +215,15 @@ export default function RegisterStudent({ api }: { api: string }) {
         }
       );
       console.log("This is response: ", response.data);
+      setStudentList((prevStudents) =>
+      prevStudents.map((student) =>
+      student._id === selectedStudent?._id ? incomingData : student
+        )
+      );
       setSuccessMessage("Success");
       setIsStudentModelComponentOpen(false);
       setTimeout(() => {
-        window.location.href = "register-student";
+        setSuccessMessage("");
       }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -235,7 +240,7 @@ export default function RegisterStudent({ api }: { api: string }) {
     }
   };
 
-  //Add Teacher
+  //Add Student
   const addStudent = () => {
     setIsUpdate(false);
     setIsStudentModelComponentOpen(true);

@@ -15,7 +15,7 @@ interface ModalProps {
 }
 
 export default function ConfirmModal({ data, onClose, onSave }: ModalProps) {
-  const [updatedName, setUpdatedName] = useState(data?.name || data?.section);
+  const [updatedName, setUpdatedName] = useState('');
   const fixedName = data?.name || data?.section;
   const id = data._id;
   console.log("This is id: ", id);
@@ -35,7 +35,7 @@ export default function ConfirmModal({ data, onClose, onSave }: ModalProps) {
           <button
             className="save-button"
             onClick={handleSave}
-            disabled={updatedName !== fixedName}
+            disabled={updatedName !== fixedName || updatedName === ""}
           >
             Delete
           </button>
