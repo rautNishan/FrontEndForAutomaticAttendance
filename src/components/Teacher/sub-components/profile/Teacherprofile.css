@@ -1,3 +1,22 @@
-.profile-container{
-    border: 2px solid black;
+.profile-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  margin-top: 200px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(91, 87, 87, 0.1);
+  background-color: #fff;
+}
+.info {
+  margin-bottom: 20px;
+}
+.profile-container h1 {
+  font-size: 1.2em;
+  color: #333;
+  font-family: sans-serif;
+}
+
+.profile-container h1 span {
+  font-weight: normal;
+  color: rgb(0, 0, 0);
 }

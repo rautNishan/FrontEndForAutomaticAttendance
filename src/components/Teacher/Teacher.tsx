@@ -4,9 +4,12 @@ import { AuthContext } from "../common/Auth/Auth";
 import LogOut from "../common/LogOut/LogOut";
 import NavBar from "../common/Nav/NavBar";
 import PageNotFound from "../common/PageNotFound/PageNotFound";
-import Home from "../common/home/Home";
 import Login from "../common/login/Login";
 import TeacherProfile from "./sub-components/profile/TeacherProfile";
+import { TeacherViewSection } from "./sub-components/sections/TeacherViewSection";
+import {
+  TeacherViewSectionDetails
+} from "./sub-components/sections/TeacherViewSectionDetails";
 
 export default function Teacher() {
   const adminLoginApi = "/teacher/login";
@@ -57,15 +60,21 @@ export default function Teacher() {
       <NavBar isLoggedIn={isLoggedIn} userRole={userRole} />
       <div className="container">
         <Routes>
-          {!isLoggedIn ? (
-            <Route path="/home" element={<Home user="Teacher" />} />
-          ) : null}
           {isLoggedIn && <Route path="/profile" element={<TeacherProfile />} />}
+          {isLoggedIn && (
+            <Route
+              path="/section-details/:section"
+              element={<TeacherViewSectionDetails />}
+            />
+          )}
           {!isLoggedIn ? (
             <Route
               path="/login"
               element={<Login api={adminLoginApi} role="teacher" />}
             />
+          ) : null}
+          {isLoggedIn ? (
+            <Route path="/section" element={<TeacherViewSection />} />
           ) : null}
           <Route path="/logout" element={<LogOut />} />
           <Route path="*" element={<PageNotFound />} />

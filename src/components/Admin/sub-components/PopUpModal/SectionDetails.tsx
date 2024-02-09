@@ -1,261 +1,171 @@
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AxiosError } from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import customAxios from "../../../../apis/axios";
-import { AuthContext } from "../../../common/Auth/Auth";
-import "../css/Faculty.css";
-interface ISectionEdit {
+
+interface ISection {
   _id: string;
   section: string;
 }
 
 interface ModalProps {
-  role: string;
-  sectionData: ISectionEdit;
+  inComingSectionData: ISection;
   onClose: () => void;
-  // onSave: (id: string) => void;
 }
-interface ITeacher {
-  _id?: string;
-  name: string;
-  college_id: string;
-  faculty: string;
-  email: string;
-  password: string;
-}
-export function SectionDetail({
-  role,
-  sectionData,
-  onClose,
-}: // onSave,
-ModalProps) {
-  const [userList, setUserList] = useState<ITeacher[]>([]);
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
-  const [searchValues, setSearchValues] = useState(null || "");
-  const [message, setMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState(null || "");
-  const usersPerPage = 5;
 
-  const deleteUserFromSection = (id: string) => {
-    try {
-      console.log("This is Role: ", role);
-      const response = customAxios.patch(
-        `admin/delete-${role}-section/${id}`,
-        { section: sectionData?.section },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log("This is Response: ", response);
-      setUserList((prevUsers) => prevUsers.filter((user) => user._id !== id));
-      setTotalUsers(totalUsers - 1);
-      setSuccessMessage("Deleted Successfully");
-      setTimeout(() => {
-        setSuccessMessage("");
-        if (userList.length === 5 && (totalUsers - 1) % 5 === 0) {
-          console.log("Yes length is 1 or 5");
-          window.location.href = "register-teacher";
-        }
-      }, 1200);
-      // setIsViewDetailsModal(false);
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          setUserRole("");
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-          alert(error.response.data.message);
-        }
+interface ITimeTable {
+  startTime: string;
+  endTime: string;
+}
+
+interface ISectionDetailProps {
+  _id: string;
+  section: string;
+  studentCounts: number;
+  teacherCounts: number;
+  timeTable: ITimeTable[];
+}
+
+export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
+  const [sectionData, setSectionData] = useState<ISectionDetailProps>();
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
+
+  useEffect(() => {
+    const fetchSectionDetail = async () => {
+      const token = localStorage.getItem("token");
+      const getSectionAccordingApi = `/admin/get-all-section?section=${inComingSectionData.section}`;
+      const response = await customAxios.get(getSectionAccordingApi, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setSectionData(response.data.data.existingData[0]);
+    };
+    fetchSectionDetail();
+  }, [inComingSectionData.section]);
+
+  const updateSectionTimeTable = async (updatedTimeTable: ITimeTable[]) => {
+    const token = localStorage.getItem("token");
+    const response = await customAxios.patch(
+      `/admin/update-section/${inComingSectionData?._id}`,
+      { timeTable: updatedTimeTable },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
+    );
+    if (response.status === 200) {
+      setSectionData((prevData) =>
+        prevData
+          ? {
+              ...prevData,
+              timeTable: updatedTimeTable,
+            }
+          : undefined
+      );
+    } else {
+      console.error("Failed to update time");
     }
   };
 
-  //Get all teacher or students
-  useEffect(() => {
-    const listAllUserApi = `admin/get-all-${role}/${sectionData.section}?page=${currentPage}`;
-    const token = localStorage.getItem("token");
-    const fetchTeachers = async () => {
-      try {
-        const response = await customAxios.get(listAllUserApi, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response.data.data.totalCount);
-        if (response.data.data.totalCount === 0) {
-          setMessage(`No ${role} found in this section`);
-        }
-        setTotalUsers(response.data.data.totalCount);
-        console.log("This is Response: ", response.data.data.teachers);
-        setUserList(response.data.data.teachers);
-      } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-          if (error.response.status === 401) {
-            //401 is Unauthorized from my backend
-            setUserRole("");
-            setIsLoggedIn(false);
-            localStorage.removeItem("token");
-            alert(error.response.data.message);
-          }
-        }
-      }
-    };
-    fetchTeachers();
-  }, [
-    setUserRole,
-    setIsLoggedIn,
-    currentPage,
-    setTotalUsers,
-    sectionData.section,
-    role,
-  ]);
-
-  // Search teacher or student when searchValues changes
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const searchTeacher = async () => {
-      const response = await customAxios.get(
-        `admin/get-all-${role}/${sectionData.section}?search_key=${searchValues}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const responseData = response.data.data.teachers;
-      console.log("This is Search");
-
-      setUserList(responseData);
-    };
-    if (searchValues != "" || searchValues != null) {
-      searchTeacher();
+  const handleAddTime = async () => {
+    if (newStartTime && newEndTime && sectionData) {
+      const newTimeSlot = { startTime: newStartTime, endTime: newEndTime };
+      const updatedTimeTable = [...sectionData.timeTable, newTimeSlot];
+      await updateSectionTimeTable(updatedTimeTable);
+      setNewStartTime("");
+      setNewEndTime("");
     }
-  }, [searchValues, sectionData.section, role]);
+  };
+
+  const handleEdit = async (
+    index: number,
+    field: keyof ITimeTable,
+    value: string
+  ) => {
+    if (sectionData) {
+      const updatedTimeTable = [...sectionData.timeTable];
+      updatedTimeTable[index][field] = value;
+      await updateSectionTimeTable(updatedTimeTable);
+    }
+  };
+
+  const handleDelete = async (timeSlotToDelete: ITimeTable) => {
+    if (sectionData) {
+      const updatedTimeTable = sectionData.timeTable.filter(
+        (timeSlot) => timeSlot !== timeSlotToDelete
+      );
+      await updateSectionTimeTable(updatedTimeTable);
+    }
+  };
 
   return (
     <>
       <div className="popup-modal-container">
-        <div className="popup-options-modal ">
-          <div className="table">
-            {successMessage && (
-                <div className="success_message">
-                  <strong>{successMessage}</strong>
-
-                  <button
-                    className="close_button"
-                    onClick={() => {
-                      setSuccessMessage("");
-                    }}
-                  >
-                    <span>&times;</span>
-                  </button>
-                </div>
-            )}
-            <div className="table_header">
-              <p>
-                <strong>
-                  Total {role}: {totalUsers}
-                </strong>
-              </p>
-              <div className="sub_header">
-                <input
-                  placeholder={`Search ${role}`}
-                  value={searchValues}
-                  onChange={(e) => setSearchValues(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <p className="error">{message}</p>
-            <div className="table_body">
-              <table>
-                <thead>
-                  <tr>
-                    <th>
-                      {role === "teacher" ? "Teacher Name" : "Student Name"}
-                    </th>
-                    <th>Faculty</th>
-                    <th>Email</th>
-                    <th>College Id</th>
-                    <th>Actions</th>
+        <div className="popup-section-detail-modal">
+          <h1>Section: {inComingSectionData?.section}</h1>
+          <h1>Student Count:{sectionData?.studentCounts}</h1>
+          <h1>Teacher Count:{sectionData?.teacherCounts}</h1>
+          <h1>Time Table:</h1>
+          <div className="table_body">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sectionData?.timeTable.map((timeSlot, index) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        type="text"
+                        value={timeSlot.startTime}
+                        onChange={(e) =>
+                          handleEdit(index, "startTime", e.target.value)
+                        }
+                      />
+                      -
+                      <input
+                        type="text"
+                        value={timeSlot.endTime}
+                        onChange={(e) =>
+                          handleEdit(index, "endTime", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td>
+                      <button
+                        className="delete_button"
+                        onClick={() => handleDelete(timeSlot)}
+                      >
+                        Delete
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {userList.map((user) => (
-                    <tr key={user.name}>
-                      {/* key={faculty.name} */}
-                      <td>
-                        <strong>{user.name}</strong>
-                      </td>
-                      <td>
-                        {" "}
-                        <strong>{user.faculty}</strong>
-                      </td>
-                      <td>
-                        <strong>{user.email}</strong>
-                      </td>
-                      <td>
-                        <strong>{user.college_id}</strong>
-                      </td>
-                      {/* <td>{faculty.teacherCount}</td> 
-                  <td>{faculty.studentCount}</td>  */}
-                      <td>
-                        <button
-                          className="delete_button"
-                          title="Delete teacher from section"
-                          onClick={() => deleteUserFromSection(user._id || "")}
-                        >
-                          <FontAwesomeIcon className="icon" icon={faTrashAlt} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
-          {totalUsers >= usersPerPage && (
-            <div className="pagination">
-              <ul className="pagination-ul">
-                <li className="page-item">
-                  <button
-                    className={`page-link ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                    onClick={() =>
-                      currentPage > 1 && setCurrentPage(currentPage - 1)
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                </li>
-                <li className="page-item">
-                  <button
-                    className={`page-link ${
-                      currentPage === Math.ceil(totalUsers / usersPerPage)
-                        ? "disabled"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      currentPage < Math.ceil(totalUsers / usersPerPage) &&
-                      setCurrentPage(currentPage + 1)
-                    }
-                    disabled={
-                      currentPage === Math.ceil(totalUsers / usersPerPage)
-                    }
-                  >
-                    Next
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
+          <div className="add_time">
+            <h1>Add Time:</h1>
+            <input
+              type="text"
+              placeholder="Start Time"
+              value={newStartTime}
+              onChange={(e) => setNewStartTime(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="End Time"
+              value={newEndTime}
+              onChange={(e) => setNewEndTime(e.target.value)}
+            />
+            <button className="edit_button" onClick={handleAddTime}>
+              Add Time
+            </button>
+          </div>
           <button className="delete_button" onClick={onClose}>
             Close
           </button>

@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import { useContext, useEffect, useState } from "react";
 import customAxios from "../../../../apis/axios";
 import { AuthContext } from "../../../common/Auth/Auth";
-
+import "./TeacherProfile.css";
 interface UserObject {
   college_id: string;
   email: string;
@@ -51,12 +51,34 @@ export default function TeacherProfile() {
 
   return (
     <>
-      <h1>This is Teacher Profile</h1>
-      <h1>Name: {userObject.name}</h1>
-      <h1>Email: {userObject.email}</h1>
-      <h1>Faculty: {userObject.faculty}</h1>
-      <h1>Sections: {userObject.section}</h1>
-      <h1>CollegeID: {userObject.college_id}</h1>
+      <div className="profile-container">
+        <div className="info">
+          <h1>
+            Name: <span>{userObject.name}</span>
+          </h1>
+        </div>
+
+        <div className="info">
+          <h1>
+            Email: <span>{userObject.email}</span>
+          </h1>
+        </div>
+        <div className="info">
+          <h1>
+            Faculty: <span>{userObject.faculty}</span>
+          </h1>
+        </div>
+        <div className="info">
+          <h1>
+            Sections: <span>{userObject.section.join(", ")}</span>
+          </h1>
+        </div>
+        <div className="info">
+        <h1>
+          CollegeID: <span>{userObject.college_id}</span>
+        </h1>
+        </div>
+      </div>
     </>
   );
 }

@@ -17,7 +17,20 @@
   text-align: center;
   box-shadow: 9px -11px 15px 3px rgba(255, 255, 255, 0.3);
 }
-
+.popup-section-detail-modal{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 700px;
+  z-index: 1000;
+  height: 7x70px;
+  text-align: center;
+  box-shadow: 9px -11px 15px 3px rgba(255, 255, 255, 0.3);
+}
 .popup-options-modal {
   position: fixed;
   top: 50%;
@@ -59,3 +72,10 @@
 }
 
 
+.add_time{
+  display:block;
+  padding: 8px 15px;
+  text-align: center;
+  margin: 10px;
+  color: black;
+}

@@ -1,4 +1,4 @@
-import { useMatch, useResolvedPath } from "react-router-dom";
+import { Link, useMatch, useResolvedPath } from "react-router-dom";
 import "./NavStyle.css";
 
 export default function NavBar({
@@ -44,6 +44,9 @@ export default function NavBar({
         {isLoggedIn && userRole === "teacher" && (
           <CustomLink to="profile" name="Profile" />
         )}
+        {isLoggedIn && userRole === "teacher" && (
+          <CustomLink to="section" name="Sections" />
+        )}
         {isLoggedIn && userRole === "admin" && (
           <CustomLink to="register-teacher" name="Register Teacher" />
         )}
@@ -62,15 +65,27 @@ type CustomLinkProps = {
   [key: string]: string;
 };
 
+// function CustomLink({ to, name, ...props }: CustomLinkProps) {
+//   console.log("This is to: ", to);
+//   const resolvePath = useResolvedPath(to);
+//   const isActive = useMatch({ path: resolvePath.pathname, end: true });
+//   return (
+//     <li className={isActive ? "active" : ""}>
+//       <a href={to} {...props}>
+//         {name}
+//       </a>
+//     </li>
+//   );
+// }
+
 function CustomLink({ to, name, ...props }: CustomLinkProps) {
-  console.log("This is to: ", to);
   const resolvePath = useResolvedPath(to);
   const isActive = useMatch({ path: resolvePath.pathname, end: true });
   return (
     <li className={isActive ? "active" : ""}>
-      <a href={to} {...props}>
+      <Link to={to} {...props}>
         {name}
-      </a>
+      </Link>
     </li>
   );
 }

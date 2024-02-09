@@ -7,6 +7,7 @@ import { AuthContext } from "../../common/Auth/Auth";
 import ConfirmModal from "../../common/Modal/ConfirmModel";
 import "./css/Faculty.css";
 import AssignOptionModal from "./PopUpModal/TeacherOptionsModal";
+import { UserSectionDetail } from "./PopUpModal/UserSectionDetails";
 import { SectionDetail } from "./PopUpModal/SectionDetails";
 interface ISection {
   _id: string;
@@ -29,7 +30,9 @@ export default function Section() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isAssignModel, setIsAssignModalOpen] = useState(false);
   const [isDeleteModel, setIsDeleteModalOpen] = useState(false);
-  const [isViewDetailsModal, setIsViewDetailsModal] = useState(false);
+  const [isViewUserDetailModal, setIsUserViewDetailsModal] = useState(false);
+  const [isViewSectionDetailModal, setIsViewSectionDetailModal] =
+    useState(false);
 
   const [selectedSection, setSelectedSection] = useState<ISectionEdit | null>(
     null
@@ -109,67 +112,6 @@ export default function Section() {
     setSelectedSection(section);
     setIsAssignModalOpen(true);
   };
-
-  //Assign User into Section
-  // const saveAssignUser = async (id: string) => {
-  //   try {
-  //     const response = await customAxios.patch(
-  //       `admin/update-${role}/${id}`,
-  //       { section: selectedSection?.section },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-  //     console.log("This is Response: ", response.data);
-  //     setIsAssignModalOpen(false);
-  //     setSuccessMessage("Assigned Successfully");
-  //     setTimeout(() => {
-  //       window.location.href = "section";
-  //     }, 1000);
-  //   } catch (error) {
-  //     if (axios.isAxiosError(error)) {
-  //       if (error.response?.data.message == "JWT EXPIRED") {
-  //         setUserRole("");
-  //         setIsLoggedIn(false);
-  //         localStorage.removeItem("token");
-  //         alert(error.response.data.message);
-  //       }
-  //       const responseToBeSent = error.response?.data.message;
-  //       setErrorMessage(responseToBeSent);
-  //       setIsAssignModalOpen(false);
-  //     }
-  //   }
-  // };
-
-  // //Delete Section from User
-  // const deleteSectionFromUser = async (id: string) => {
-  //   try {
-  //     console.log("This is Role: ", role);
-  //     const response = customAxios.patch(
-  //       `admin/delete-${role}-section/${id}`,
-  //       { section: selectedSection?.section },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-  //     console.log("This is Response: ", response);
-  //     setSuccessMessage("Deleted Successfully");
-  //     setIsViewDetailsModal(false);
-  //   } catch (error) {
-  //     if (error instanceof AxiosError && error.response) {
-  //       if (error.response.status === 401) {
-  //         setUserRole("");
-  //         setIsLoggedIn(false);
-  //         localStorage.removeItem("token");
-  //         alert(error.response.data.message);
-  //       }
-  //     }
-  //   }
-  // };
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -271,10 +213,16 @@ export default function Section() {
     }
   }
 
+  const handleViewDetailAboutUsers = (section: ISectionEdit) => {
+    console.log("This is Section: ", section);
+    setSelectedSection(section);
+    setIsUserViewDetailsModal(true);
+  };
+
   const handleViewDetailAboutSection = (section: ISectionEdit) => {
     console.log("This is Section: ", section);
     setSelectedSection(section);
-    setIsViewDetailsModal(true);
+    setIsViewSectionDetailModal(true);
   };
 
   return (
@@ -356,13 +304,21 @@ export default function Section() {
                 {sectionList.map((section) => (
                   <tr key={section.section}>
                     <td>
-                      <strong>{section.section}</strong>
+                      <button
+                        title="View Section Details"
+                        onClick={() => {
+                          handleViewDetailAboutSection(section);
+                        }}
+                      >
+                        <strong>{section.section}</strong>
+                      </button>
                     </td>
                     <td>
                       <button
+                        title="View Teacher Details in Section"
                         onClick={() => {
                           setRole("teacher");
-                          handleViewDetailAboutSection(section);
+                          handleViewDetailAboutUsers(section);
                         }}
                       >
                         <strong>{section.teacherCounts}</strong>
@@ -370,9 +326,10 @@ export default function Section() {
                     </td>
                     <td>
                       <button
+                        title="View Students Details in Section"
                         onClick={() => {
                           setRole("student");
-                          handleViewDetailAboutSection(section);
+                          handleViewDetailAboutUsers(section);
                         }}
                       >
                         <strong>{section.studentCounts}</strong>
@@ -485,16 +442,26 @@ export default function Section() {
         />
       )}
 
-      {isViewDetailsModal && <div className="modal-backdrop" />}
-      {isViewDetailsModal && selectedSection && (
-        <SectionDetail
+      {isViewUserDetailModal && <div className="modal-backdrop" />}
+      {isViewUserDetailModal && selectedSection && (
+        <UserSectionDetail
           role={role}
           sectionData={selectedSection}
           onClose={() => {
-            setIsViewDetailsModal(false);
+            setIsUserViewDetailsModal(false);
             window.location.href = "section";
           }}
-          // onSave={deleteSectionFromUser}
+        />
+      )}
+
+      {isViewSectionDetailModal && <div className="modal-backdrop" />}
+      {isViewSectionDetailModal && selectedSection && (
+        <SectionDetail
+        inComingSectionData={selectedSection}
+          onClose={() => {
+            setIsViewSectionDetailModal(false);
+            window.location.href = "section";
+          }}
         />
       )}
     </>
