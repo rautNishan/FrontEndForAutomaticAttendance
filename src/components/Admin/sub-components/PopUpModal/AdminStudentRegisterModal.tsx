@@ -6,6 +6,7 @@ interface ModalProps {
   onClose: () => void;
   isUpdate?: boolean;
   initialData?: {
+    _id?: string;
     name: string;
     college_id?: string;
     faculty: string;

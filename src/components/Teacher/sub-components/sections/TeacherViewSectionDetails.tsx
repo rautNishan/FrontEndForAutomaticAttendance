@@ -146,7 +146,7 @@ export function TeacherViewSectionDetails() {
                   <td>
                     <strong>{user.college_id}</strong>
                   </td>
-                  <td>
+                  <td className="link">
                     <Link
                       className="view-details-link"
                       title={`View Detail of  ${user.name}`}
@@ -172,7 +172,7 @@ export function TeacherViewSectionDetails() {
                 }
                 disabled={currentPage === 1}
               >
-                Previous
+                Previous  
               </button>
             </li>
             <li className="page-item">

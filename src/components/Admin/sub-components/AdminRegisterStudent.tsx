@@ -21,6 +21,7 @@ interface IStudent {
 }
 
 interface IStudentRegisterData {
+  _id?: string;
   name: string;
   college_id: string;
   faculty: string;
@@ -93,6 +94,7 @@ export default function RegisterStudent({ api }: { api: string }) {
       searchTeacher();
     }
   }, [searchValues]);
+
   //Closing Model
   const closeModel = () => {
     setSelectedStudent(null);
@@ -112,7 +114,8 @@ export default function RegisterStudent({ api }: { api: string }) {
         },
       });
       setIsStudentModelComponentOpen(false);
-      console.log("This is response: ", response.data);
+      console.log("This is response after register: ", response.data.data._id);
+      student._id = response.data.data._id;
       setTotalStudent(totalStudent + 1);
       if (studentList.length < 5 || totalStudent === 0) {
         setStudentList((prevStudent) => [...prevStudent, student]);
@@ -129,7 +132,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         // if (totalStudent === 5) {
         //   window.location.href = "register-student";
         // }
-      }, 1000);
+      }, 1200);
       // window.location.href = "register-student";
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
@@ -141,6 +144,9 @@ export default function RegisterStudent({ api }: { api: string }) {
         }
         setErrorMessage(error.response.data.message);
         setIsStudentModelComponentOpen(false);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1200);
       }
     }
   };
@@ -175,7 +181,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         if (studentList.length === 5 && (totalStudent - 1) % 5 === 0) {
           window.location.href = "register-student";
         }
-      }, 1000);
+      }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -216,8 +222,8 @@ export default function RegisterStudent({ api }: { api: string }) {
       );
       console.log("This is response: ", response.data);
       setStudentList((prevStudents) =>
-      prevStudents.map((student) =>
-      student._id === selectedStudent?._id ? incomingData : student
+        prevStudents.map((student) =>
+          student._id === selectedStudent?._id ? incomingData : student
         )
       );
       setSuccessMessage("Success");
@@ -236,6 +242,9 @@ export default function RegisterStudent({ api }: { api: string }) {
         const responseToBeSent = error.response?.data.message;
         setErrorMessage(responseToBeSent);
         setIsStudentModelComponentOpen(false);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1200);
       }
     }
   };
@@ -255,16 +264,6 @@ export default function RegisterStudent({ api }: { api: string }) {
               {/* <p>{errorMessage}</p> */}
               <strong>{errorMessage}</strong>
             </div>
-
-            <button
-              className="close_button"
-              onClick={() => {
-                setErrorMessage(null);
-                window.location.href = "register-student";
-              }}
-            >
-              <span>&times;</span>
-            </button>
           </div>
         )}
 

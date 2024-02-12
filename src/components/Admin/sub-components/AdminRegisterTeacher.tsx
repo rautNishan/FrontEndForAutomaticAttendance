@@ -24,6 +24,7 @@ interface ITeacher {
 //   name: string;
 // }
 interface ITeacherRegisterData {
+  _id?: string;
   name: string;
   college_id: string;
   faculty: string;
@@ -117,7 +118,6 @@ export default function RegisterTeacher({ api }: { api: string }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("This is Response: ", response.data);
       setIsTeacherModelComponentOpen(false);
       console.log("This is Total Teacher in Register: ", totalTeachers);
       setTotalTeachers(totalTeachers + 1);
@@ -125,6 +125,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
         "This is Total TeacherList in Register after: ",
         teacherList.length
       );
+      teacher._id = response.data.data._id;
       if (teacherList.length < 5 || totalTeachers === 0) {
         setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
       }
@@ -135,7 +136,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
         //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
         //   // window.location.href = "register-teacher";
         // }
-      }, 1000);
+      }, 1200);
       // window.location.href = "register-teacher";
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
@@ -154,8 +155,11 @@ export default function RegisterTeacher({ api }: { api: string }) {
     }
   };
 
+  console.log("This is Teacher List: ", teacherList);
+
   //Delete
   const handleDelete = (teacher: ITeacher) => {
+    console.log("This is Teacher: ", teacher);
     setSelectedTeacher(teacher);
     setIsDeleteModalOpen(true);
   };
@@ -183,10 +187,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
 
       setTimeout(() => {
         setSuccessMessage("");
-        if (
-          teacherList.length === 5 &&
-          (totalTeachers - 1) % 5 === 0
-        ) {
+        if (teacherList.length === 5 && (totalTeachers - 1) % 5 === 0) {
           console.log("Yes length is 1 or 5");
           window.location.href = "register-teacher";
         }
@@ -269,16 +270,6 @@ export default function RegisterTeacher({ api }: { api: string }) {
               {/* <p>{errorMessage}</p> */}
               <strong>{errorMessage}</strong>
             </div>
-
-            <button
-              className="close_button"
-              onClick={() => {
-                setErrorMessage(null);
-                window.location.href = "register-teacher";
-              }}
-            >
-              <span>&times;</span>
-            </button>
           </div>
         )}
 
@@ -363,9 +354,9 @@ export default function RegisterTeacher({ api }: { api: string }) {
                         className="delete_button"
                         onClick={() =>
                           handleDelete({
+                            _id: teacher._id,
                             name: teacher.name,
                             college_id: teacher.college_id,
-                            _id: teacher._id,
                             faculty: teacher.faculty,
                             email: teacher.email,
                             password: "",

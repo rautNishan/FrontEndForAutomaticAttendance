@@ -141,124 +141,124 @@ ModalProps) {
     <>
       <div className="popup-modal-container">
         <div className="popup-options-modal ">
-          <div className="table">
-            {successMessage && (
-                <div className="success_message">
-                  <strong>{successMessage}</strong>
-
-                  <button
-                    className="close_button"
-                    onClick={() => {
-                      setSuccessMessage("");
-                    }}
-                  >
-                    <span>&times;</span>
-                  </button>
+          <div className="table_container">
+          {successMessage && (
+                <div className="success_container">
+                  <div className="success_message">
+                    <strong>{successMessage}</strong>
+                  </div>
                 </div>
-            )}
-            <div className="table_header">
-              <p>
-                <strong>
-                  Total {role}: {totalUsers}
-                </strong>
-              </p>
-              <div className="sub_header">
-                <input
-                  placeholder={`Search ${role}`}
-                  value={searchValues}
-                  onChange={(e) => setSearchValues(e.target.value)}
-                  required
-                />
+              )}
+            <div className="table">
+              <div className="table_header">
+                <p>
+                  <strong>
+                    Total {role}: {totalUsers}
+                  </strong>
+                </p>
+                <div className="sub_header">
+                  <input
+                    placeholder={`Search ${role}`}
+                    value={searchValues}
+                    onChange={(e) => setSearchValues(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <p className="error">{message}</p>
+              <div className="table_body">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>
+                        {role === "teacher" ? "Teacher Name" : "Student Name"}
+                      </th>
+                      <th>Faculty</th>
+                      <th>Email</th>
+                      <th>College Id</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userList.map((user) => (
+                      <tr key={user.name}>
+                        {/* key={faculty.name} */}
+                        <td>
+                          <strong>{user.name}</strong>
+                        </td>
+                        <td>
+                          {" "}
+                          <strong>{user.faculty}</strong>
+                        </td>
+                        <td>
+                          <strong>{user.email}</strong>
+                        </td>
+                        <td>
+                          <strong>{user.college_id}</strong>
+                        </td>
+                        {/* <td>{faculty.teacherCount}</td> 
+                  <td>{faculty.studentCount}</td>  */}
+                        <td>
+                          <button
+                            className="delete_button"
+                            title="Delete teacher from section"
+                            onClick={() =>
+                              deleteUserFromSection(user._id || "")
+                            }
+                          >
+                            <FontAwesomeIcon
+                              className="icon"
+                              icon={faTrashAlt}
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <p className="error">{message}</p>
-            <div className="table_body">
-              <table>
-                <thead>
-                  <tr>
-                    <th>
-                      {role === "teacher" ? "Teacher Name" : "Student Name"}
-                    </th>
-                    <th>Faculty</th>
-                    <th>Email</th>
-                    <th>College Id</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userList.map((user) => (
-                    <tr key={user.name}>
-                      {/* key={faculty.name} */}
-                      <td>
-                        <strong>{user.name}</strong>
-                      </td>
-                      <td>
-                        {" "}
-                        <strong>{user.faculty}</strong>
-                      </td>
-                      <td>
-                        <strong>{user.email}</strong>
-                      </td>
-                      <td>
-                        <strong>{user.college_id}</strong>
-                      </td>
-                      {/* <td>{faculty.teacherCount}</td> 
-                  <td>{faculty.studentCount}</td>  */}
-                      <td>
-                        <button
-                          className="delete_button"
-                          title="Delete teacher from section"
-                          onClick={() => deleteUserFromSection(user._id || "")}
-                        >
-                          <FontAwesomeIcon className="icon" icon={faTrashAlt} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {totalUsers >= usersPerPage && (
+              <div className="pagination">
+                <ul className="pagination-ul">
+                  <li className="page-item">
+                    <button
+                      className={`page-link ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                      onClick={() =>
+                        currentPage > 1 && setCurrentPage(currentPage - 1)
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                  </li>
+                  <li className="page-item">
+                    <button
+                      className={`page-link ${
+                        currentPage === Math.ceil(totalUsers / usersPerPage)
+                          ? "disabled"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        currentPage < Math.ceil(totalUsers / usersPerPage) &&
+                        setCurrentPage(currentPage + 1)
+                      }
+                      disabled={
+                        currentPage === Math.ceil(totalUsers / usersPerPage)
+                      }
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+            <button className="delete_button" onClick={onClose}>
+              Close
+            </button>
           </div>
-          {totalUsers >= usersPerPage && (
-            <div className="pagination">
-              <ul className="pagination-ul">
-                <li className="page-item">
-                  <button
-                    className={`page-link ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                    onClick={() =>
-                      currentPage > 1 && setCurrentPage(currentPage - 1)
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                </li>
-                <li className="page-item">
-                  <button
-                    className={`page-link ${
-                      currentPage === Math.ceil(totalUsers / usersPerPage)
-                        ? "disabled"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      currentPage < Math.ceil(totalUsers / usersPerPage) &&
-                      setCurrentPage(currentPage + 1)
-                    }
-                    disabled={
-                      currentPage === Math.ceil(totalUsers / usersPerPage)
-                    }
-                  >
-                    Next
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
-          <button className="delete_button" onClick={onClose}>
-            Close
-          </button>
         </div>
       </div>
     </>

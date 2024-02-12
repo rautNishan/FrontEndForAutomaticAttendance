@@ -106,7 +106,7 @@ export function TeacherViewSection() {
                       <td>
                         <strong>{section.studentCounts}</strong>
                       </td>
-                      <td>
+                      <td className="link">
                         <Link
                           className="view-details-link"
                           title={`View Section ${section.section} Details`}

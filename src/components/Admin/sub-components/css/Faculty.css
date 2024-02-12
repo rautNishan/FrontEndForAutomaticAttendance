@@ -147,19 +147,25 @@ tr {
 
 .error_container {
   background-color: #f8d7da;
-  padding: 10px;
-  border-radius: 6px;
-  width: 80%;
-  display: flex;
-  justify-content: center;
+  position: absolute;
+  right: 50;
+  top: 0;
+  animation: slideInFromTop 0.3s ease-out; 
+  border-radius: 10px;
+ 
+  height: 60px;
+  width: 350px;
 }
+
 .success_container {
-  background-color: #d4edda;
-  padding: 10px;
-  border-radius: 6px;
-  width: 80%;
-  display: flex;
-  justify-content: center;
+  position: absolute;
+  right: 50;
+  top: 0; 
+  animation: slideInFromTop 0.3s ease-out; /* Use the new animation */
+  border-radius: 10px;
+  
+  height: 70px;
+  width: 350px;
 }
 .close_button {
   padding: 8px 15px;
@@ -175,16 +181,20 @@ span {
 }
 
 .error_message {
-  padding: 8px;
+  text-align: center;
   background-color: #f8d7da;
+  border-radius: 10px;
+  height: 30px;
+  padding: 7px;
 }
 
 .success_message {
   text-align: center;
-  padding: 8px;
   background-color: #d4edda;
+  border-radius: 10px;
+  height: 30px;
+  padding: 7px;
 }
-
 
 .icon {
   height: 2.5vh;
@@ -257,6 +267,15 @@ span {
   background-color: #cccccc;
   color: #666666;
   cursor: not-allowed;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @media screen and (max-width: 768px) {

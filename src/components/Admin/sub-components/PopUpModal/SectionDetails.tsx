@@ -12,6 +12,7 @@ interface ModalProps {
 }
 
 interface ITimeTable {
+  subject: string;
   startTime: string;
   endTime: string;
 }
@@ -28,6 +29,7 @@ export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
   const [sectionData, setSectionData] = useState<ISectionDetailProps>();
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
+  const [newSubject, setNewSubject] = useState("");
 
   useEffect(() => {
     const fetchSectionDetail = async () => {
@@ -69,10 +71,15 @@ export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
   };
 
   const handleAddTime = async () => {
-    if (newStartTime && newEndTime && sectionData) {
-      const newTimeSlot = { startTime: newStartTime, endTime: newEndTime };
+    if (newSubject && newStartTime && newEndTime && sectionData) {
+      const newTimeSlot = {
+        subject: newSubject,
+        startTime: newStartTime,
+        endTime: newEndTime,
+      };
       const updatedTimeTable = [...sectionData.timeTable, newTimeSlot];
       await updateSectionTimeTable(updatedTimeTable);
+      setNewSubject("");
       setNewStartTime("");
       setNewEndTime("");
     }
@@ -111,6 +118,7 @@ export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
             <table>
               <thead>
                 <tr>
+                  <th>Subject</th>
                   <th>Time</th>
                   <th>Actions</th>
                 </tr>
@@ -118,6 +126,9 @@ export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
               <tbody>
                 {sectionData?.timeTable.map((timeSlot, index) => (
                   <tr key={index}>
+                    <td>
+                      <strong>{timeSlot.subject}</strong>
+                    </td>
                     <td>
                       <input
                         type="text"
@@ -152,6 +163,12 @@ export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
             <h1>Add Time:</h1>
             <input
               type="text"
+              placeholder="Subject"
+              value={newSubject}
+              onChange={(e) => setNewSubject(e.target.value)}
+            />
+            <input
+              type="text"
               placeholder="Start Time"
               value={newStartTime}
               onChange={(e) => setNewStartTime(e.target.value)}
@@ -171,6 +188,7 @@ export function SectionDetail({ inComingSectionData, onClose }: ModalProps) {
           </button>
         </div>
       </div>
+      
     </>
   );
 }

@@ -5,7 +5,7 @@ import axios, { AxiosError } from "axios";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AuthContext } from "../../../common/Auth/Auth";
-import "../css/Faculty.css";
+import "../css/UserOption.css";
 interface ISectionEdit {
   _id: string;
   section: string;
@@ -42,14 +42,20 @@ export default function AssignOptionModal({
   useEffect(() => {
     const listAllUserAccordingToSectionApi = `/admin/get-all-${role}?page=${currentPage}`;
     const token = localStorage.getItem("token");
-    console.log("This is List All Teacher Api: ", listAllUserAccordingToSectionApi);
+    console.log(
+      "This is List All Teacher Api: ",
+      listAllUserAccordingToSectionApi
+    );
     const fetchTeachers = async () => {
       try {
-        const response = await customAxios.get(listAllUserAccordingToSectionApi, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await customAxios.get(
+          listAllUserAccordingToSectionApi,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log(response.data.data.totalCount);
         setTotalUser(response.data.data.totalCount);
         console.log("This is Response: ", response.data.data.teachers);
@@ -103,7 +109,7 @@ export default function AssignOptionModal({
       setSuccessMessage("Assigned Successfully");
       setTimeout(() => {
         setSuccessMessage("");
-      }, 1000);
+      }, 1200);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -125,136 +131,124 @@ export default function AssignOptionModal({
     <>
       <div className="popup-modal-container">
         <div className="popup-options-modal ">
-          {errorMessage && (
-            <div className="error_message">
-              <strong>{errorMessage}</strong>
-
-              <button
-                className="close_button"
-                onClick={() => {
-                  setErrorMessage(null);
-                }}
-              >
-                <span>&times;</span>
-              </button>
-            </div>
-          )}
-          {successMessage && (
-            <div className="success_message">
-              <strong>{successMessage}</strong>
-
-              <button
-                className="close_button"
-                onClick={() => {
-                  setSuccessMessage("");
-                }}
-              >
-                <span>&times;</span>
-              </button>
-            </div>
-          )}
-          <div className="table">
-            <div className="table_header">
-              <p>
-                <strong>Total Teachers: {totalUser}</strong>
-              </p>
-              <div className="sub_header">
-                <input
-                  placeholder="Search Teacher"
-                  value={searchValues}
-                  onChange={(e) => setSearchValues(e.target.value)}
-                  required
-                />
+          <div className="table_container">
+            {errorMessage && (
+              <div className="error_container">
+              <div className="error_message">
+                <strong>{errorMessage}</strong>
+              </div>
+              </div>
+            )}
+            {successMessage && (
+              <div className="success_container">
+                <div className="success_message">
+                  <strong>{successMessage}</strong>
+                </div>
+              </div>
+            )}
+            <div className="table">
+              <div className="table_header">
+                <p>
+                  <strong>Total Teachers: {totalUser}</strong>
+                </p>
+                <div className="sub_header">
+                  <input
+                    placeholder="Search Teacher"
+                    value={searchValues}
+                    onChange={(e) => setSearchValues(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="table_body">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Teacher Name</th>
+                      <th>Faculty</th>
+                      <th>Email</th>
+                      <th>College Id</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teacherList.map((teacher) => (
+                      <tr key={teacher.name}>
+                        {/* key={faculty.name} */}
+                        <td>
+                          <strong>{teacher.name}</strong>
+                        </td>
+                        <td>
+                          {" "}
+                          <strong>{teacher.faculty}</strong>
+                        </td>
+                        <td>
+                          <strong>{teacher.email}</strong>
+                        </td>
+                        <td>
+                          <strong>{teacher.college_id}</strong>
+                        </td>
+                        {/* <td>{faculty.teacherCount}</td> 
+                  <td>{faculty.studentCount}</td>  */}
+                        <td>
+                          <button
+                            className="edit_button"
+                            title="Assign Teacher to Section"
+                            onClick={() => addSection(teacher._id || "")}
+                          >
+                            <FontAwesomeIcon
+                              className="icon"
+                              icon={faCirclePlus}
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div className="table_body">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Teacher Name</th>
-                    <th>Faculty</th>
-                    <th>Email</th>
-                    <th>College Id</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {teacherList.map((teacher) => (
-                    <tr key={teacher.name}>
-                      {/* key={faculty.name} */}
-                      <td>
-                        <strong>{teacher.name}</strong>
-                      </td>
-                      <td>
-                        {" "}
-                        <strong>{teacher.faculty}</strong>
-                      </td>
-                      <td>
-                        <strong>{teacher.email}</strong>
-                      </td>
-                      <td>
-                        <strong>{teacher.college_id}</strong>
-                      </td>
-                      {/* <td>{faculty.teacherCount}</td> 
-                  <td>{faculty.studentCount}</td>  */}
-                      <td>
-                        <button
-                          className="edit_button"
-                          title="Assign Teacher to Section"
-                          onClick={() => addSection(teacher._id || "")}
-                        >
-                          <FontAwesomeIcon
-                            className="icon"
-                            icon={faCirclePlus}
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {totalUser > teachersPerPage && (
+              <div className="pagination">
+                <ul className="pagination-ul">
+                  <li className="page-item">
+                    <button
+                      className={`page-link ${
+                        currentPage === 1 ? "disabled" : ""
+                      }`}
+                      onClick={() =>
+                        currentPage > 1 && setCurrentPage(currentPage - 1)
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                  </li>
+                  <li className="page-item">
+                    <button
+                      className={`page-link ${
+                        currentPage === Math.ceil(totalUser / teachersPerPage)
+                          ? "disabled"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        currentPage < Math.ceil(totalUser / teachersPerPage) &&
+                        setCurrentPage(currentPage + 1)
+                      }
+                      disabled={
+                        currentPage === Math.ceil(totalUser / teachersPerPage)
+                      }
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+            <button className="delete_button" onClick={onClose}>
+              Close
+            </button>
           </div>
-          {totalUser > teachersPerPage && (
-            <div className="pagination">
-              <ul className="pagination-ul">
-                <li className="page-item">
-                  <button
-                    className={`page-link ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                    onClick={() =>
-                      currentPage > 1 && setCurrentPage(currentPage - 1)
-                    }
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                </li>
-                <li className="page-item">
-                  <button
-                    className={`page-link ${
-                      currentPage === Math.ceil(totalUser / teachersPerPage)
-                        ? "disabled"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      currentPage < Math.ceil(totalUser / teachersPerPage) &&
-                      setCurrentPage(currentPage + 1)
-                    }
-                    disabled={
-                      currentPage === Math.ceil(totalUser / teachersPerPage)
-                    }
-                  >
-                    Next
-                  </button>
-                </li>
-              </ul>
-            </div>
-          )}
-          <button className="delete_button" onClick={onClose}>
-            Close
-          </button>
         </div>
       </div>
     </>

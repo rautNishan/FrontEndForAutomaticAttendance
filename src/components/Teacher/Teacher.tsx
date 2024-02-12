@@ -10,6 +10,7 @@ import { TeacherViewSection } from "./sub-components/sections/TeacherViewSection
 import {
   TeacherViewSectionDetails
 } from "./sub-components/sections/TeacherViewSectionDetails";
+import TeacherViewIndividualStudentDetails from "./sub-components/studentDetails/TeacherViewStudentAttendance";
 
 export default function Teacher() {
   const adminLoginApi = "/teacher/login";
@@ -65,6 +66,12 @@ export default function Teacher() {
             <Route
               path="/section-details/:section"
               element={<TeacherViewSectionDetails />}
+            />
+          )}
+           {isLoggedIn && (
+            <Route
+              path="/student-detail/:student"
+              element={<TeacherViewIndividualStudentDetails />}
             />
           )}
           {!isLoggedIn ? (

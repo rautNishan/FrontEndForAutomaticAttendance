@@ -194,7 +194,7 @@ export default function Section() {
         //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
         //   // window.location.href = "register-teacher";
         // }
-      }, 1000);
+      }, 1200);
       // window.location.href = "section";
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -233,32 +233,12 @@ export default function Section() {
             <div className="error_message">
               <strong>{errorMessage}</strong>
             </div>
-
-            <button
-              className="close_button"
-              onClick={() => {
-                setErrorMessage(null);
-                window.location.href = "section";
-              }}
-            >
-              <span>&times;</span>
-            </button>
           </div>
         )}
         {successMessage && (
           <div className="success_container">
             <div className="success_message">
               <strong>{successMessage}</strong>
-
-              <button
-                className="close_button"
-                onClick={() => {
-                  setSuccessMessage("");
-                  window.location.href = "section";
-                }}
-              >
-                <span>&times;</span>
-              </button>
             </div>
           </div>
         )}

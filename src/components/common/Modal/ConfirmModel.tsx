@@ -15,11 +15,8 @@ interface ModalProps {
 }
 
 export default function ConfirmModal({ data, onClose, onSave }: ModalProps) {
-  const [updatedName, setUpdatedName] = useState('');
+  const [updatedName, setUpdatedName] = useState("");
   const fixedName = data?.name || data?.section;
-  const id = data._id;
-  console.log("This is id: ", id);
-  console.log("This is Updated Name Updated name: ", updatedName);
   const handleSave = () => {
     onSave();
   };
