@@ -4,6 +4,7 @@ import Teacher from "./components/Teacher/Teacher";
 import { AuthProvider } from "./components/common/Auth/Auth";
 import "./index.css";
 import PageNotFound from "./components/common/PageNotFound/PageNotFound";
+import Student from "./components/Student/Student";
 function App() {
   const userRole = localStorage.getItem("userRole");
   console.log("This is userRole in App: ", userRole);
@@ -19,6 +20,11 @@ function App() {
           )}
           {userRole === "teacher" || userRole === "" ? (
             <Route path="/teacher/*" element={<Teacher />} />
+          ) : (
+            <Route path="/teacher/*" element={<PageNotFound />} />
+          )}
+          {userRole === "student" || userRole === "" ? (
+            <Route path="/student/*" element={<Student />} />
           ) : (
             <Route path="/teacher/*" element={<PageNotFound />} />
           )}

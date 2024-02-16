@@ -109,7 +109,7 @@ export default function AssignOptionModal({
       setSuccessMessage("Assigned Successfully");
       setTimeout(() => {
         setSuccessMessage("");
-      }, 1200);
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {

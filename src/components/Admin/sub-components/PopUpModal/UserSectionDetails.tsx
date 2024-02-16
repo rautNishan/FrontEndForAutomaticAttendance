@@ -61,7 +61,7 @@ ModalProps) {
           console.log("Yes length is 1 or 5");
           window.location.href = "register-teacher";
         }
-      }, 1200);
+      }, 2000);
       // setIsViewDetailsModal(false);
     } catch (error) {
       if (error instanceof AxiosError && error.response) {

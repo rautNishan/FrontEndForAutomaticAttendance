@@ -132,7 +132,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         // if (totalStudent === 5) {
         //   window.location.href = "register-student";
         // }
-      }, 1200);
+      }, 2000);
       // window.location.href = "register-student";
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
@@ -146,7 +146,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         setIsStudentModelComponentOpen(false);
         setTimeout(() => {
           setErrorMessage(null);
-        }, 1200);
+        }, 2000);
       }
     }
   };
@@ -181,7 +181,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         if (studentList.length === 5 && (totalStudent - 1) % 5 === 0) {
           window.location.href = "register-student";
         }
-      }, 1200);
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -230,7 +230,7 @@ export default function RegisterStudent({ api }: { api: string }) {
       setIsStudentModelComponentOpen(false);
       setTimeout(() => {
         setSuccessMessage("");
-      }, 1200);
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -244,7 +244,7 @@ export default function RegisterStudent({ api }: { api: string }) {
         setIsStudentModelComponentOpen(false);
         setTimeout(() => {
           setErrorMessage(null);
-        }, 1200);
+        }, 2000);
       }
     }
   };

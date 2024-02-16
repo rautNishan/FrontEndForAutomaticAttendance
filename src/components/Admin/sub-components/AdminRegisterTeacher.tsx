@@ -136,7 +136,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
         //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
         //   // window.location.href = "register-teacher";
         // }
-      }, 1200);
+      }, 2000);
       // window.location.href = "register-teacher";
     } catch (error) {
       if (error instanceof AxiosError && error.response) {
@@ -150,7 +150,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
         setIsTeacherModelComponentOpen(false);
         setTimeout(() => {
           setErrorMessage(null);
-        }, 1200);
+        }, 2000);
       }
     }
   };
@@ -191,7 +191,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
           console.log("Yes length is 1 or 5");
           window.location.href = "register-teacher";
         }
-      }, 1200);
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -239,7 +239,7 @@ export default function RegisterTeacher({ api }: { api: string }) {
       setIsTeacherModelComponentOpen(false);
       setTimeout(() => {
         setSuccessMessage("");
-      }, 1200);
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {

@@ -91,7 +91,7 @@ export default function Section() {
         if (sectionList.length === 5 && (totalSection - 1) % 5 === 0) {
           window.location.href = "section";
         }
-      }, 1200);
+      }, 2000);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.data.message == "JWT EXPIRED") {
@@ -194,7 +194,7 @@ export default function Section() {
         //   // setTeacherList((prevTeachers) => [...prevTeachers, teacher]);
         //   // window.location.href = "register-teacher";
         // }
-      }, 1200);
+      }, 2000);
       // window.location.href = "section";
     } catch (error) {
       if (axios.isAxiosError(error)) {

@@ -17,6 +17,7 @@ interface Section {
 
 export function TeacherViewSection() {
   const token = localStorage.getItem("token");
+  const [totalSection, setTotalSection] = useState(0);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   const [searchValues, setSearchValues] = useState(null || "");
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +35,8 @@ export function TeacherViewSection() {
             },
           }
         );
-        setSectionList(response.data.data);
+        setSectionList(response.data.data.result);
+        setTotalSection(response.data.data.totalCount);
       } catch (error) {
         if (
           error instanceof AxiosError &&
@@ -51,7 +53,7 @@ export function TeacherViewSection() {
     fetchPersonalData();
   }, [token, setIsLoggedIn, setUserRole, currentPage]);
 
-  // Search teacher or student when searchValues changes
+  // Search sections related teacher
   useEffect(() => {
     const token = localStorage.getItem("token");
     const searchStudentAccordingToSection = async () => {
@@ -63,8 +65,7 @@ export function TeacherViewSection() {
           },
         }
       );
-      const responseData = response.data.data;
-
+      const responseData = response.data.data.result;
       setSectionList(responseData);
     };
     if (searchValues != "" || searchValues != null) {
@@ -124,7 +125,7 @@ export function TeacherViewSection() {
           {/* )} */}
         </div>
       </div>
-      {sectionList.length >= sectionPerPage && (
+      {totalSection >= sectionPerPage && (
         <div className="pagination">
           <ul className="pagination-ul">
             <li className="page-item">
@@ -141,17 +142,17 @@ export function TeacherViewSection() {
             <li className="page-item">
               <button
                 className={`page-link ${
-                  currentPage === Math.ceil(sectionList.length / sectionPerPage)
+                  currentPage === Math.ceil(totalSection/ sectionPerPage)
                     ? "disabled"
                     : ""
                 }`}
                 onClick={() =>
                   currentPage <
-                    Math.ceil(sectionList.length / sectionPerPage) &&
+                    Math.ceil(totalSection / sectionPerPage) &&
                   setCurrentPage(currentPage + 1)
                 }
                 disabled={
-                  currentPage === Math.ceil(sectionList.length / sectionPerPage)
+                  currentPage === Math.ceil(totalSection / sectionPerPage)
                 }
               >
                 Next

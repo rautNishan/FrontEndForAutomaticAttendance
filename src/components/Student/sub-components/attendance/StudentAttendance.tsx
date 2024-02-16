@@ -1,11 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { AuthContext } from "../../../common/Auth/Auth";
 import customAxios from "../../../../apis/axios";
 import { AxiosError } from "axios";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
-import TeacherEditAttendanceModal from "./TeacherEditPopUpModal";
 export interface IAttendance {
   _id: string;
   attendance_date: string;
@@ -22,33 +18,22 @@ export interface IAttendance {
   updatedAt: string;
 }
 
-export default function TeacherViewIndividualStudentDetails() {
-  const { student } = useParams();
+export default function StudentAttendance() {
   const [currentPage, setCurrentPage] = useState(1);
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
-  console.log("student", student);
   const [attendanceList, setAttendanceList] = useState<IAttendance[]>([]);
-  const [selectedAttendance, setSelectedAttendance] =
-    useState<IAttendance | null>(null);
 
   const [totalCount, setTotalCount] = useState(0);
-  const [isOpenEditAttendanceModal, setIsOpenEditAttendanceModal] =
-    useState(false);
+  useState(false);
   const [message, setMessage] = useState("");
   const [searchValues, setSearchValues] = useState(null || "");
-  const [successMessage, setSuccessMessage] = useState("");
   const dataPerPage = 5;
   console.log("This is Total Count: ", totalCount);
-
-  const handleEditAttendance = (attendance: IAttendance) => {
-    setSelectedAttendance(attendance);
-    setIsOpenEditAttendanceModal(true);
-  };
 
   //Get student Attendance Details
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const studentAttendanceList = `/teacher/get-student-attendance/${student}/?page=${currentPage}`;
+    const studentAttendanceList = `/student/get-student-attendance/?page=${currentPage}`;
     // const studentProfile= `/teacher/get-student-profile/${student}`;
     const fetchAttendanceData = async () => {
       try {
@@ -77,7 +62,7 @@ export default function TeacherViewIndividualStudentDetails() {
       }
     };
     fetchAttendanceData();
-  }, [setUserRole, setIsLoggedIn, student, currentPage]);
+  }, [setUserRole, setIsLoggedIn, currentPage]);
   console.log("attendanceList", attendanceList);
 
   // Search attendance when searchValues changes
@@ -86,7 +71,7 @@ export default function TeacherViewIndividualStudentDetails() {
     const searchTeacher = async () => {
       console.log("This is Search Value: ", searchValues);
       const response = await customAxios.get(
-        `teacher/get-student-attendance/${student}?attendance_date=${searchValues}&page=${currentPage}`,
+        `student/get-student-attendance?attendance_date=${searchValues}&page=${currentPage}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -94,70 +79,16 @@ export default function TeacherViewIndividualStudentDetails() {
         }
       );
       const responseData = response.data.data.result;
-      console.log("This is Response Data after Search: ", responseData);
-
-      console.log("This is Search Value: ", searchValues);
-
-      console.log("Second UseEffect");
       setAttendanceList(responseData);
     };
     if (searchValues != "" || searchValues != null) {
       searchTeacher();
     }
-  }, [searchValues, student, currentPage]);
-
-  const save = async (attendanceStatus: string) => {
-    const token = localStorage.getItem("token");
-    if (selectedAttendance) {
-      selectedAttendance.status = attendanceStatus;
-    }
-    try {
-      await customAxios.patch(
-        "/teacher/update-student-attendance",
-        selectedAttendance,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // Update the attendanceList state
-      setAttendanceList((prevList) => {
-        return prevList.map((attendance) =>
-          attendance._id === selectedAttendance?._id
-            ? selectedAttendance
-            : attendance
-        );
-      });
-      setSuccessMessage("Attendance Updated Successfully");
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 2000);
-
-      setIsOpenEditAttendanceModal(false);
-    } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        if (error.response.status === 401) {
-          //401 is Unauthorized from my backend
-          setUserRole("");
-          setIsLoggedIn(false);
-          localStorage.removeItem("token");
-          alert(error.response.data.message);
-        }
-      }
-    }
-  };
+  }, [searchValues, currentPage]);
 
   return (
     <>
       <div className="table_container">
-        {successMessage && (
-          <div className="success_container">
-            <div className="success_message">
-              <strong>{successMessage}</strong>
-            </div>
-          </div>
-        )}
         <div className="table">
           <div className="table_header">
             <p>
@@ -187,13 +118,21 @@ export default function TeacherViewIndividualStudentDetails() {
                   <th>End Time</th>
                   <th>Status</th>
                   <th>Presented Time</th>
-                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {attendanceList.length <= 0 ? (
                   <tr>
-                    <td colSpan={3}>{message}</td>
+                    <td
+                      colSpan={6}
+                      style={{
+                        textAlign: "center",
+                        textTransform: "uppercase",
+                        color: "red",
+                      }}
+                    >
+                      {message}
+                    </td>
                   </tr>
                 ) : (
                   attendanceList.map((attendance, index) => {
@@ -225,17 +164,6 @@ export default function TeacherViewIndividualStudentDetails() {
                           {attendance.status === "ABSENT"
                             ? "-"
                             : formattedUpdatedAtTime}
-                        </td>
-                        <td>
-                          <button
-                            className="edit_button"
-                            title="Edit Faculty"
-                            onClick={() => {
-                              handleEditAttendance(attendance);
-                            }}
-                          >
-                            <FontAwesomeIcon className="icon" icon={faEdit} />
-                          </button>
                         </td>
                       </tr>
                     );
@@ -278,16 +206,6 @@ export default function TeacherViewIndividualStudentDetails() {
             </li>
           </ul>
         </div>
-      )}
-      {isOpenEditAttendanceModal && <div className="modal-backdrop" />}
-      {isOpenEditAttendanceModal && selectedAttendance && (
-        <TeacherEditAttendanceModal
-          onSave={save}
-          onClose={() => {
-            setIsOpenEditAttendanceModal(false);
-            window.location.href = `/teacher/student-detail/${student}`;
-          }}
-        />
       )}
     </>
   );

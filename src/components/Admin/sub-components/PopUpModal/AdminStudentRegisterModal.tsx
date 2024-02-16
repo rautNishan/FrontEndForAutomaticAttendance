@@ -44,8 +44,9 @@ export default function StudentDataModal({
     onSave({ name, faculty, email, college_id, password });
   };
 
+  //Flask Server
   const takePicture = async () => {
-    const flaskApi = "http://127.0.0.1:3002/admin-student/picture";
+    const flaskApi = "http://192.168.1.9:3002/admin-student/picture";
     try {
       setMessage("Press C to capture the image and Q to close the camera.");
       const response = await axios.post(

@@ -17,7 +17,7 @@ export default function Login({ api, role }: { api: string; role: string }) {
       redirectAfterLogin = "profile";
       break;
     case "student":
-      redirectAfterLogin = "my-attendance";
+      redirectAfterLogin = "profile";
       break;
   }
   const [email, setEmail] = useState("");

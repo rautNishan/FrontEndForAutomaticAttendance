@@ -53,6 +53,12 @@ export default function NavBar({
         {isLoggedIn && userRole === "admin" && (
           <CustomLink to="register-student" name="Register Student" />
         )}
+        {isLoggedIn && userRole === "student" && (
+          <CustomLink to="profile" name="Profile" />
+        )}
+        {isLoggedIn && userRole === "student" && (
+          <CustomLink to="my-attendance" name="My-Attendance" />
+        )}
         {isLoggedIn && <CustomLink to="logout" name="Logout" />}
       </ul>
     </div>
