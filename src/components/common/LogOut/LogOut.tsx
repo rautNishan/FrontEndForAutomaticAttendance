@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "../Auth/Auth";
-
+import "./LogOut.css";
 export default function LogOut() {
   const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
   const handleLogout = () => {
@@ -15,7 +15,9 @@ export default function LogOut() {
   };
   return (
     <>
-      <button onClick={handleLogout}>Log Out</button>
+    <div className="log-out-container">
+    <button className="edit_button" onClick={handleLogout}>Log Out</button>
+    </div>
     </>
   );
 }

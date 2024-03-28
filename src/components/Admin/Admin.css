@@ -4,3 +4,28 @@
   margin-top: 120px;
   height: auto;
 }
+
+.dash_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: sans-serif;
+  font-size: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.chart-wrapper {
+  max-width: 690px;
+  margin-top: 30px;
+}
+
