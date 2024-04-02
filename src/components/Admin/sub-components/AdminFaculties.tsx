@@ -189,6 +189,7 @@ export default function Faculties() {
                         onClick={() =>
                           handleDelete({ name: faculty.name, _id: faculty._id })
                         }
+                        disabled={faculty.studentCounts > 0 || faculty.teacherCounts > 0}
                       >
                         <FontAwesomeIcon className="icon" icon={faTrashAlt} />
                       </button>

@@ -97,6 +97,24 @@ export default function AdminDashBoard() {
     fetchFaculties();
   }, [setTotalTeacherCount, setTotalStudentCount, setIsLoggedIn, setUserRole]);
 
+  const handleStartServerClick = async () => {
+    const url = "http://localhost:3002/recognize-and-add-attendance";
+    try {
+      customAxios.get(url);
+
+      // Handle successful request here (e.g., display a success message)
+      alert(
+        "Server started successfully! Click on the pop-up screen and pres c to exit!!"
+      );
+    } catch (error) {
+      // Handle errors here (e.g., display an error message)
+      if (error instanceof AxiosError && error.response) {
+        alert(error.response.data.message);
+      } else {
+        console.error("Error starting the server:", error);
+      }
+    }
+  };
   const options = {
     labels: labels,
     responsive: [
@@ -165,6 +183,15 @@ export default function AdminDashBoard() {
   ];
   return (
     <>
+      <div className="run_server">
+        <button
+          className="edit_button"
+          title="Start Server"
+          onClick={handleStartServerClick}
+        >
+          Start Server
+        </button>
+      </div>
       <div className="dash_container">
         <h1>Total User in the Application</h1>
         <div className="chart-container">
@@ -188,6 +215,8 @@ export default function AdminDashBoard() {
           </div>
         </div>
       </div>
+
+      <div className="studentReports"></div>
     </>
   );
 }

@@ -40,10 +40,17 @@ export default function AssignOptionModal({
   const teachersPerPage = 5;
 
   useEffect(() => {
-    const listAllUserAccordingToSectionApi = `/admin/get-all-${role}?page=${currentPage}`;
+    let listAllUserAccordingToSectionApi: string = "";
+    console.log("This is Role", role);
+
+    if (role === "student") {
+      listAllUserAccordingToSectionApi = `/admin/get-all-nonSection-${role}?page=${currentPage}`;
+    } else {
+      listAllUserAccordingToSectionApi = `/admin/get-all-${role}?page=${currentPage}`;
+    }
     const token = localStorage.getItem("token");
     console.log(
-      "This is List All Teacher Api: ",
+      "This is List All User Api: ",
       listAllUserAccordingToSectionApi
     );
     const fetchTeachers = async () => {
@@ -56,14 +63,17 @@ export default function AssignOptionModal({
             },
           }
         );
-        console.log(response.data.data.totalCount);
+        console.log("This is response.data.data: ", response.data.data);
         setTotalUser(response.data.data.totalCount);
-        console.log("This is Response: ", response.data.data.teachers);
+        console.log(
+          "This is Response after request: ",
+          response.data.data.teachers
+        );
         setTeacherList(response.data.data.teachers);
       } catch (error) {
-        setUserRole("");
-        setIsLoggedIn(false);
-        localStorage.removeItem("token");
+        // setUserRole("");
+        // setIsLoggedIn(false);
+        // localStorage.removeItem("token");
         if (error instanceof AxiosError && error.response) {
           alert(error.response.data.message);
         }
@@ -75,15 +85,18 @@ export default function AssignOptionModal({
   // Search teachers when searchValues changes
   useEffect(() => {
     const token = localStorage.getItem("token");
+    let listAllUserAccordingToSection: string = "";
+    if (role === "student") {
+      listAllUserAccordingToSection = `/admin/get-all-nonSection-${role}?search_key=${searchValues}`;
+    } else {
+      listAllUserAccordingToSection = `/admin/get-all-${role}?search_key=${searchValues}`;
+    }
     const searchTeacher = async () => {
-      const response = await customAxios.get(
-        `admin/get-all-${role}?search_key=${searchValues}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await customAxios.get(listAllUserAccordingToSection, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const responseData = response.data.data.teachers;
       console.log("This is Search");
 
@@ -134,9 +147,9 @@ export default function AssignOptionModal({
           <div className="table_container">
             {errorMessage && (
               <div className="error_container">
-              <div className="error_message">
-                <strong>{errorMessage}</strong>
-              </div>
+                <div className="error_message">
+                  <strong>{errorMessage}</strong>
+                </div>
               </div>
             )}
             {successMessage && (
@@ -149,7 +162,7 @@ export default function AssignOptionModal({
             <div className="table">
               <div className="table_header">
                 <p>
-                  <strong>Total Teachers: {totalUser}</strong>
+                  <strong>Total {role}: {totalUser}</strong>
                 </p>
                 <div className="sub_header">
                   <input
@@ -164,7 +177,7 @@ export default function AssignOptionModal({
                 <table>
                   <thead>
                     <tr>
-                      <th>Teacher Name</th>
+                      <th>Name</th>
                       <th>Faculty</th>
                       <th>Email</th>
                       <th>College Id</th>
